@@ -19,6 +19,7 @@
   "homepage": "https://github.com/dbutler12/pcon-arena-bot#readme",
   "dependencies": {
     "discord.js": "^12.5.3",
-    "dotenv": "^9.0.2"
+    "dotenv": "^9.0.2",
+    "redis": "^3.1.2"
   }
 }
