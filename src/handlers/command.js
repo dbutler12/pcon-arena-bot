@@ -3,8 +3,8 @@ const r_client = redis.createClient(); //creates a new client
 r_client.on('connect', function() {
   	console.log('Redis Connected');
 });
-const bat_h  = require('battle');
-const meta_h = require('meta');
+const bat_h  = require('./battle');
+const meta_h = require('./meta');
 
 function com(command, args, client, message, state){
 	if(message.author.tag === 'Fengtorin#5328'){
