@@ -3,37 +3,38 @@ const r_client = redis.createClient(); //creates a new client
 r_client.on('connect', function() {
   	console.log('Redis Connected');
 });
-
-//TODO: Decide if a singleton makes sense in this case
-//      Hard to say since multiple calls to this function don't seem to instantiate new connections anyway
-/*
-const r_wrap   = require('../onboard/redis_wrap');
-const r_client = r_wrap.getRedis();
-*/
+const bat_h  = require('battle');
+const meta_h = require('meta');
 
 function com(command, args, client, message, state){
-	if(command === 'restart' && message.author.tag === 'Fengtorin#5328'){
-		console.log(`${message.author.tag} is requesting restart from task-bot`);
-		const channel01 = client.channels.cache.find(channel => channel.id === '833833221077860372');
-		channel01.send('restart-hyoid');
-		/*
-		client.users.fetch('833809693960962138').then(user => {
-			message.channel.send(user.tag);
-			console.log(`Sending restart message to ${user.tag}`);
-			user.send('restart-hyoid');
-		}, reason => {
-			console.log(`Something went wrong with task-bot: ${reason}`);
-			message.channel.send(`Something went wrong with task-bot: ${reason}`);
-		});
-		*/
-		return;
+	if(message.author.tag === 'Fengtorin#5328'){
+		if(command === 'restart'){
+			console.log(`${message.author.tag} is requesting restart from task-bot`);
+			const channel01 = client.channels.cache.find(channel => channel.id === '833833221077860372');
+			channel01.send('restart-arena');
+			return;
+		}else if(command === 'add-char'){
+			meta_h.addChar(r_client, args[0], args[1]);
+		}else if(command === 'init'){
+			r_client.set("cur_char_id", 0);
+			var life = r_client.get("cur_char_id");
+			message.channel.send(`cur id set to ${life}`);
+		}
 	}
 	
-	if(command === 'life'){
-		message.channel.send("and oceans, wowsors!");
-		return;
+	if(command === 'fight' || command === 'f'){
+		if(args.length == 0){ // Fight who?
+			
+		}else if(args.length >= 5){ // Full party
+			bat_h.battle(args, client, r_client, message);
+		}else{ // Less than full party, default to 0 until handled
+		
+		}
 	}
-	if(command === 'Hello' || command == 'hello'){
+	
+	/*
+	// Example Hello script to show various tools
+	if(command === 'Hello' || command === 'hello'){
 		var author = message.author.tag;
 		message.channel.send(`Hello ${author}`);
 		if(args.length != 0){
@@ -64,6 +65,7 @@ function com(command, args, client, message, state){
 			message.channel.send(str);
 		});
 	}
+	*/
 }
 
 module.exports = { com };
