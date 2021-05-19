@@ -30,9 +30,20 @@ function com(command, args, client, message, state){
 		  		message.channel.send(str);
 		  		
 		  		r_client.hgetall(`char_data_${nick[name]}`, function(err, data){
-		  			message.channel.send(data);
-		  		});
+				 		var str = "";
+						for (const property in data) {
+							str = str + `${property}: ${data[property]}` + "\n";
+						}
+						message.channel.send(str);
+					});
 				}
+			});
+			
+			r_client.multi().
+			hgetall('char_data_0').
+			hgetall('char_data_1').
+			exec(function(err, results){
+				message.channel.send(results[0]['position']);
 			});
 		}
 	}
@@ -45,6 +56,8 @@ function com(command, args, client, message, state){
 		}else{ // Less than full party, default to 0 until handled
 		
 		}
+	}else if(command === 'char'){
+		meta_h.viewChar(r_client, message, args);
 	}
 	
 	/*
