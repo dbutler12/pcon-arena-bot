@@ -16,7 +16,7 @@ function addChar(r_client, c_name, position){
 		return char_id;
 	})().then(id => {
 		var nick_obj = {};
-		nick_obj[id] = c_name;
+		nick_obj[c_name] = id;
 		r_client.hmset(`char_data_${id}`, char_obj);
 		r_client.hmset('char_nick', nick_obj);
 		r_client.incr('cur_char_id');
