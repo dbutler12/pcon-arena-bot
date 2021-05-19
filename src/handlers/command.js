@@ -19,7 +19,7 @@ function com(command, args, client, message, state){
 			r_client.set("cur_char_id", "0"); 
 		}else if(command === 'check'){
 			r_client.get('cur_char_id', function(err, val) {
-				message.channel.send(`Char id available: ${cur_char_id}`);
+				message.channel.send(`Char id available: ${val}`);
 			});
 			
 			r_client.hgetall('char_nick', function(err, nick) {
