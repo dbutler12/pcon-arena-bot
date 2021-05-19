@@ -31,7 +31,7 @@ function com(command, args, client, message, state){
 		  		
 		  		r_client.hget(`char_data_${nick[name]}`, function(err, data){
 		  			message.channel.send(data);
-		  		}
+		  		});
 				}
 			});
 		}
