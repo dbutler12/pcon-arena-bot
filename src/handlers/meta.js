@@ -26,13 +26,13 @@ function addChar(r_client, c_name, position){
 
 function viewChar(r_client, message, args){
 		r_client.hgetall('char_nick', function(err, nick) {
-			if(err){
-				message.channel.send(`Character ${args[0]} doesn't exist.`);
-				return;
+			if(!(args[0] in nick)){
+				message.channel.send(`Char ${args[0]} unknown.`);
+				return
 			}
 			
 			let id = nick[args[0]];
-	 		
+			
   		r_client.hgetall(`char_data_${id}`, function(err, data){
   			var str = "";
   			if(args.length === 1){
@@ -46,7 +46,9 @@ function viewChar(r_client, message, args){
 						}
 					}
 				}
-				message.channel.send(str);
+				if(str != ""){
+					message.channel.send(str);
+				}
 			});
 		});
 		
