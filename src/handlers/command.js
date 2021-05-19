@@ -29,7 +29,7 @@ function com(command, args, client, message, state){
 		  		str = `Name: ${name}  ID: ${nick[name]}` + "\n";
 		  		message.channel.send(str);
 		  		
-		  		r_client.hget(`char_data_${nick[name]}`, function(err, data){
+		  		r_client.hgetall(`char_data_${nick[name]}`, function(err, data){
 		  			message.channel.send(data);
 		  		});
 				}

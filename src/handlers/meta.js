@@ -1,12 +1,5 @@
 
 function addChar(r_client, c_name, position){
-	var char_obj = {
-		name:c_name,
-		position:position,
-		rec:"0-0",
-		def:0,
-		att:0
-	};
 	//Promisify redis, since it doesn't directly support promises			
 	const { promisify } = require('util');
 	const getAsync = promisify(r_client.get).bind(r_client);
@@ -15,6 +8,13 @@ function addChar(r_client, c_name, position){
 		let char_id = await getAsync('cur_char_id');
 		return char_id;
 	})().then(id => {
+		var char_obj = {
+			name:c_name,
+			position:position,
+			rec:"0-0",
+			def:0,
+			att:0
+		};
 		var nick_obj = {};
 		nick_obj[c_name] = id;
 		r_client.hmset(`char_data_${id}`, char_obj);
