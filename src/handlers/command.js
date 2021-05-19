@@ -16,9 +16,24 @@ function com(command, args, client, message, state){
 		}else if(command === 'add-char'){
 			meta_h.addChar(r_client, args[0], args[1]);
 		}else if(command === 'init'){
-			r_client.set("cur_char_id", 0);
-			var life = r_client.get("cur_char_id");
-			message.channel.send(`cur id set to ${life}`);
+			r_client.set("cur_char_id", "0"); 
+		}else if(command === 'check'){
+			r_client.get('cur_char_id', function(err, val) {
+				message.channel.send(`Char id available: ${cur_char_id}`);
+			});
+			
+			r_client.hgetall('char_nick', function(err, nick) {
+				message.channel.send("Char data:");
+		 		var str = "";
+		  	for(const name in nick) {
+		  		str = `Name: ${name}  ID: ${nick[name]}` + "\n";
+		  		message.channel.send(str);
+		  		
+		  		r_client.hget(`char_data_${nick[name]}`, function(err, data){
+		  			message.channel.send(data);
+		  		}
+				}
+			});
 		}
 	}
 	
@@ -56,7 +71,6 @@ function com(command, args, client, message, state){
 		});
 		
 		r_client.hgetall(author+'hellos', function(err, object) {
-			if(object === null) return;
 			message.channel.send("You've hello'd in these ways:");
    		var str = "";
     	for (const property in object) {
