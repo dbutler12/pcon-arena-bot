@@ -14,9 +14,12 @@ function com(command, args, client, message, state){
 			channel01.send('restart-arena');
 			return;
 		}else if(command === 'add-char'){
+			if(args.length < 2){
+				return message.channel.send("Not enough arguments to add character. Need char name and position.");
+			}
 			meta_h.addChar(r_client, args[0], args[1]);
-		}else if(command === 'init'){
-			r_client.set("cur_char_id", "0"); 
+		}else if(command === 'mod-char'){
+			meta_h.updateChar(r_client, message, args);
 		}else if(command === 'check'){
 			r_client.get('cur_char_id', function(err, val) {
 				message.channel.send(`Char id available: ${val}`);

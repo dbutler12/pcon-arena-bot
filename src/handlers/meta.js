@@ -24,11 +24,38 @@ function addChar(r_client, c_name, position){
 }
 
 
+function updateChar(r_client, message, args){
+	r_client.hgetall('char_nick', function(err, nick) {
+		if(!(args[0] in nick)){
+			message.channel.send(`Char ${args[0]} unknown.`);
+			return;
+		}
+		
+		let id = nick[args[0]];
+		let char_obj = {};
+		let mod_flag = false;
+		
+		for(let i = 1; i < args.length; i++){
+				if(i%2 === 0){
+					char_obj[args[i-1]] = args[i];
+					mod_flag = true;
+				}else if(i === args.length - 1){ // Dangling end
+					message.channel.send(`Missing value to change to for ${args[i]}`);
+				}
+		}
+		
+		if(mod_flag){
+			r_client.hmset(`char_data_${id}`, char_obj);
+		}
+	});
+}
+
+
 function viewChar(r_client, message, args){
 		r_client.hgetall('char_nick', function(err, nick) {
 			if(!(args[0] in nick)){
 				message.channel.send(`Char ${args[0]} unknown.`);
-				return
+				return;
 			}
 			
 			let id = nick[args[0]];
