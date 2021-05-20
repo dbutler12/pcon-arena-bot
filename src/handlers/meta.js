@@ -37,6 +37,16 @@ function updateChar(r_client, message, args){
 		
 		for(let i = 1; i < args.length; i++){
 				if(i%2 === 0){
+					if(args[i] === "DEL"){
+						r_client.hdel(`char_data_${id}`, args[i-1], function(err, suc){
+							if(err){
+								console.log(err);
+								return;
+							}
+							message.channel.send(`Deleted ${args[i-1]} from ${args[0]}'s data.`);
+						});
+						continue;
+					}
 					char_obj[args[i-1]] = args[i];
 					mod_flag = true;
 				}else if(i === args.length - 1){ // Dangling end
@@ -46,6 +56,7 @@ function updateChar(r_client, message, args){
 		
 		if(mod_flag){
 			r_client.hmset(`char_data_${id}`, char_obj);
+			message.channel.send(`Character data modified for ${args[0]}`);
 		}
 	});
 }
@@ -89,4 +100,4 @@ function viewChar(r_client, message, args){
 		*/
 }
 
-module.exports = { addChar, viewChar };
+module.exports = { addChar, viewChar, updateChar };
