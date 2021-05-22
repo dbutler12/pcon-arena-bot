@@ -1,3 +1,18 @@
+function addNick(r_client, c_name, n_name){
+	r_client.hgetall('char_nick', function(err, nick) {
+		let char_str = c_name.charAt(0).toUpperCase() + c_name.substr(1).toLowerCase();
+		if(!(char_str in nick)){
+			message.channel.send(`Char ${char_str} unknown.`);
+			return;
+		}
+		
+		let id = nick[char_str];
+		var nick_obj = {};
+		nick_obj[n_name] = id;
+		r_client.hmset('char_nick', nick_obj);
+	});
+}
+
 
 function addChar(r_client, c_name, position){
 	//Promisify redis, since it doesn't directly support promises			
@@ -8,14 +23,14 @@ function addChar(r_client, c_name, position){
 		let char_id = await getAsync('cur_char_id');
 		return char_id;
 	})().then(id => {
-		var char_obj = {
+		let char_obj = {
 			name:c_name,
 			position:position,
 			rec:"0-0",
 			def:0,
 			att:0
 		};
-		var nick_obj = {};
+		let nick_obj = {};
 		nick_obj[c_name] = id;
 		r_client.hmset(`char_data_${id}`, char_obj);
 		r_client.hmset('char_nick', nick_obj);
@@ -26,12 +41,13 @@ function addChar(r_client, c_name, position){
 
 function updateChar(r_client, message, args){
 	r_client.hgetall('char_nick', function(err, nick) {
-		if(!(args[0] in nick)){
-			message.channel.send(`Char ${args[0]} unknown.`);
+		let char_str = args[0].charAt(0).toUpperCase() + args[0].substr(1).toLowerCase();
+		if(!(char_str in nick)){
+			message.channel.send(`Char ${char_str} unknown.`);
 			return;
 		}
 		
-		let id = nick[args[0]];
+		let id = nick[char_str];
 		let char_obj = {};
 		let mod_flag = false;
 		
@@ -64,21 +80,22 @@ function updateChar(r_client, message, args){
 
 function viewChar(r_client, message, args){
 		r_client.hgetall('char_nick', function(err, nick) {
-			if(!(args[0] in nick)){
-				message.channel.send(`Char ${args[0]} unknown.`);
+			let char_str = args[0].charAt(0).toUpperCase() + args[0].substr(1).toLowerCase();
+			if(!(char_str in nick)){
+				message.channel.send(`Char ${char_str} unknown.`);
 				return;
 			}
 			
-			let id = nick[args[0]];
+			let id = nick[char_str];
 			
   		r_client.hgetall(`char_data_${id}`, function(err, data){
-  			var str = "";
+  			let str = "";
   			if(args.length === 1){
 					for (const d in data) {
 						str = str + `${d}: ${data[d]}` + "\n";
 					}
 				}else{
-					for(var i = 1; i < args.length; i++){
+					for(let i = 1; i < args.length; i++){
 						if(args[i] in data){
 							str = str + `${args[i]}: ${data[args[i]]}` + "\n";
 						}
@@ -100,4 +117,4 @@ function viewChar(r_client, message, args){
 		*/
 }
 
-module.exports = { addChar, viewChar, updateChar };
+module.exports = { addNick, addChar, viewChar, updateChar };
