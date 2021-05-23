@@ -15,6 +15,16 @@ function battle(r_client, message, args){
 		hgetall(`char_data_${id_arr[3]}`).
 		hgetall(`char_data_${id_arr[4]}`).
 		exec(function(err,results){
+			console.log(results);
+			let debug = "";
+			for(let i = 0; i < results.length; i++){
+				if('position' in results[i]){
+					debug = debug + i + " " + results[i]['name'] + " at " + results[i]['position'] + "\n";
+				}else{
+					message.channel.send(`Position not in result ${i}`);
+				}
+			}
+			message.channel.send(debug);
 			let char_arr = [];
 			char_arr[0] = results[0];
 			for(let i = 1; i < results.length; i++){
