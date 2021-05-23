@@ -24,7 +24,7 @@ function com(command, args, client, message, state){
 			if(args.length !== 2){
 				return message.channel.send("Not enough arguments to add nickname. Need char name and nick name.");
 			}
-			meta_h.addNick(r_client, args[0], args[1]);
+			meta_h.addNick(r_client, message, args[0], args[1]);
 		}else if(command === 'check'){
 			r_client.get('cur_char_id', function(err, val) {
 				message.channel.send(`Char id available: ${val}`);
@@ -57,12 +57,10 @@ function com(command, args, client, message, state){
 	}
 	
 	if(command === 'fight' || command === 'f'){
-		if(args.length == 0){ // Fight who?
-			
-		}else if(args.length >= 5){ // Full party
+		if(args.length === 5){ // Full party
 			bat_h.battle(args, client, r_client, message);
-		}else{ // Less than full party, default to 0 until handled
-		
+		}else{ // Wrong party size
+			message.channel.send("Enemy party needs 5 members.");
 		}
 	}else if(command === 'char'){
 		meta_h.viewChar(r_client, message, args);
