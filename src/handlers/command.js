@@ -58,7 +58,7 @@ function com(command, args, client, message, state){
 	
 	if(command === 'fight' || command === 'f'){
 		if(args.length === 5){ // Full party
-			bat_h.battle(args, client, r_client, message);
+			bat_h.battle(r_client, message, args);
 		}else{ // Wrong party size
 			message.channel.send("Enemy party needs 5 members.");
 		}
