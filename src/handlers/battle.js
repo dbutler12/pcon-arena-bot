@@ -1,3 +1,40 @@
+function Unit(name, position){
+	this.name = name;
+	this.position = position;
+}
+
+function Team(data, num){
+	this.num = num;
+	this.units = [];
+	
+	this.init = function() {
+		let unit = new Unit(data[0]['name'], data[0]['position']);
+		this.units[0] = unit;
+		
+		for(let i = 1; i < this.num; i++){
+			let cur = new Unit(data[i]['name'], data[0]['position']);
+			
+			for(let j = i - 1; j < this.num; j++){
+				if(this.units[j]['position'] < cur['position']){
+					this.units[j+1] = this.units[j];
+					if(j === 0){
+						this.units[j] = cur;
+					}
+				}else{
+					this.units[j + 1] = cur;
+					break;
+				}
+			}
+		}
+	}
+	
+	this.units_str = function(){
+		return units.map(u => u.name).join('_');
+	}
+	
+	this.init();
+}
+
 function battle(r_client, message, args){
 	r_client.hgetall('char_nick', function(err, nick) {
 		let id_arr = [];
@@ -15,6 +52,10 @@ function battle(r_client, message, args){
 		hgetall(`char_data_${id_arr[3]}`).
 		hgetall(`char_data_${id_arr[4]}`).
 		exec(function(err,results){
+			let team = new Team(results, results.length);
+			message.channel.send(team.units_str);
+		/*
+			// Old iterative approach to creating team
 			let char_arr = [];
 			let char_obj = {};
 			char_obj['name'] = results[0]['name'];
@@ -38,6 +79,7 @@ function battle(r_client, message, args){
 					}
 				}
 			}
+		*/
 		/*
 		//This example works for a basic response option
 		let user = m => m.author.id === message.author.id
@@ -62,12 +104,6 @@ function battle(r_client, message, args){
         });
     })
 			*/
-			str = "Battle Against: \n";
-			for(let i = 0; i < char_arr.length; i++){
-				str = str + i + " " + char_arr[i]['name'] + " at " + char_arr[i]['position'] + "\n";
-			}
-			message.channel.send(str);
-		});
 	});
 	
 	/*
