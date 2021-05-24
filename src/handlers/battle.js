@@ -104,20 +104,8 @@ function battle(r_client, message, args){
         });
     })
 			*/
+		});
 	});
-	
-	/*
- message.channel.send(`Battling `);
-	r_client.multi().
-	hgetall('char_data_0').
-	hgetall('char_data_1').
-	exec(function(err, results){
-		message.channel.send(results[0]['position']);
-	});
- for(var i = 0; i < args.length; i++){
- 	message.channel.send(`${args[i]} `);
- }
- */
 }
 
 module.exports = { battle };
