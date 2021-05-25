@@ -27,8 +27,6 @@ function com(command, args, client, message, state){
 			meta_h.addNick(r_client, message, args[0], args[1]);
 		}else if(command === 'update-version'){
 			meta_h.updateVer(r_client, args[0]);
-		}else if(command === 'version'){
-			meta_h.getVer(r_client);
 		}else if(command === 'check'){
 			r_client.get('cur_char_id', function(err, val) {
 				message.channel.send(`Char id available: ${val}`);
@@ -68,6 +66,8 @@ function com(command, args, client, message, state){
 		}
 	}else if(command === 'char'){
 		meta_h.viewChar(r_client, message, args);
+	}else if(command === 'version'){
+		meta_h.getVer(r_client, message);
 	}
 	
 	/*

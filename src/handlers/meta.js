@@ -5,7 +5,7 @@ function updateVer(r_client, version){
 }
 
 
-function getVer(r_client){
+function getVer(r_client, message){
 	r_client.get('version', function(err, reply){
 		message.channel.send(`Princess Connect Version: ${reply}`);
 	});
