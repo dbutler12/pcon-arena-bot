@@ -14,7 +14,7 @@ function Team(data, num){
 		for(let i = 1; i < this.num; i++){
 			let cur = new Unit(data[i]['name'], data[i]['position']);
 			
-			for(let j = i - 1; j < this.num; j++){
+			for(let j = i - 1; j < this.num; j--){
 				if(this.units[j]['position'] < cur['position']){
 					this.units[j+1] = this.units[j];
 					if(j === 0){
@@ -26,11 +26,13 @@ function Team(data, num){
 				}
 			}
 		}
-	}();
+	}
 	
 	this.units_str = function(){
 		return this.units.map(u => u.name).join('_');
 	}
+	
+	this.init();
 }
 
 function battle(r_client, message, args){
