@@ -88,7 +88,7 @@ function A_Teams(version){
 			}
 		}
 		let str = "";
-		for(int i = 0; i < this.num; i++){
+		for(let i = 0; i < this.num; i++){
 			let team = arr[i].team.split("_");
 			let y_n = this[arr[i].team];
 			str = str + ":" + team.join("::") + ":  " + "YES:" + y_n[0] + " NO:" + y_n[1] + "\n";
