@@ -120,15 +120,6 @@ function viewChar(r_client, message, args){
 				}
 			});
 		});
-		
-		/*
-		r_client.multi().
-		hgetall('char_data_0').
-		hgetall('char_data_1').
-		exec(function(err, results){
-			message.channel.send(results[0]['position']);
-		});
-		*/
 }
 
 module.exports = { addNick, addChar, viewChar, updateChar, updateVer, getVer };

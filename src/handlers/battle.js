@@ -48,7 +48,7 @@ function submitFirstTeam(r_client, message, nick, d_team){
         errors: ['time']
       })
       .then(message => {
-      	// Was recommended to use message = message.first(); not sure why
+      	message = message.first();
       	const raw_team = message.content.trim().split(/\s+/);
 				
 				if(raw_team.length === 5) {
