@@ -23,7 +23,7 @@ function Team(data, num){
 				}else if(this.units[j]['position'] < cur['position']){ // Invalid team
 					this.num = -1
 					return;
-				else{
+				}else{
 					this.units[j + 1] = cur;
 					break;
 				}
