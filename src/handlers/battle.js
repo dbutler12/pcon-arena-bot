@@ -187,7 +187,7 @@ function battle(r_client, message, args){
 				if(results === null){ // No teams exist!
 					submitFirstTeam(r_client, message, nick, team, version);
 				}else{ // Teams exist!
-					let cur_ver = new A_Team(version);
+					let cur_ver = new A_Teams(version);
 					
 					for(const r in results){ // All the submitted teams
 						const c = r.charAt(0);
