@@ -25,6 +25,8 @@ function com(command, args, client, message, state){
 				return message.channel.send("Not enough arguments to add nickname. Need char name and nick name.");
 			}
 			meta_h.addNick(r_client, message, args[0], args[1]);
+		}else if(command === 'update-version'){
+			meta_h.updateVer(r_client, args[0]);
 		}else if(command === 'check'){
 			r_client.get('cur_char_id', function(err, val) {
 				message.channel.send(`Char id available: ${val}`);

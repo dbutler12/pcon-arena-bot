@@ -1,3 +1,10 @@
+function updateVer(r_client, version){
+	r_client.set('version', version, function(err, reply){
+		console.log(`Version set: ${reply}`);
+	});
+}
+
+
 function addNick(r_client, message, c_name, n_name){
 	r_client.hgetall('char_nick', function(err, nick) {
 		let char_str = c_name.charAt(0).toUpperCase() + c_name.substr(1).toLowerCase();
