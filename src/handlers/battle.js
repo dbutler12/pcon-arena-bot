@@ -110,7 +110,7 @@ function battle(r_client, message, args){
 			// message.channel.send(team.units_str());
 		
 			r_client.hgetall(team.units_str(), function(err, results){
-				if(results.length === 0){ // No teams exist!
+				if(results === null){ // No teams exist!
 					submitFirstTeam(r_client, message, nick, team);
 				}else{
 					let str = "";
