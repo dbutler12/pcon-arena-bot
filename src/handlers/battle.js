@@ -68,13 +68,12 @@ function submitFirstTeam(r_client, message, nick, d_team){
 					hgetall(`char_data_${id_arr[4]}`).
 					get(`version`).
 					exec(function(err,results){
-						let version = results['version'];
-						delete results['version'];
-						let a_team = new Team(results, results.length);
+						let version = results[results.length - 1];
+						let a_team = new Team(results, results.length - 1);
 						if(a_team.num === -1) return message.channel.send("Invalid team: can't have duplicate characters.");
 						let entry = a_team.units_str();
 						let version_entry = version + "_" + entry;
-						let team_obj = { entry:version , version_entry:"1_0" };
+						let team_obj = { [entry]:version , [version_entry]:"1_0" };
 						r_client.hmset(d_team.units_str(), team_obj);
 					});
 				}else{
