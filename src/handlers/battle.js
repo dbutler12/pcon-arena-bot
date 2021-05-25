@@ -75,7 +75,7 @@ function submitFirstTeam(r_client, message, nick, d_team){
 						let entry = a_team.units_str();
 						let version_entry = version + "_" + entry;
 						let team_obj = { entry:version , version_entry:"1_0" };
-						r_client.hmset(d_team.unit_str(), team_obj);
+						r_client.hmset(d_team.units_str(), team_obj);
 					});
 				}else{
 					message.channel.send("Invalid team.");
