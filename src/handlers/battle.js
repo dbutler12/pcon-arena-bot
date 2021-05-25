@@ -44,7 +44,7 @@ function A_Teams(version){
 	this.num = 0;
 	
 	this.addTeam = function(team, y_n){
-		this[num] = team;
+		this[this.num] = team;
 		this[team] = y_n;
 		this.num++;
 	}
