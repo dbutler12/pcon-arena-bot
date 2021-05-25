@@ -110,10 +110,13 @@ function submitFirstTeam(r_client, message, nick, d_team, version){
       	const PREFIX = "!";
       	message = message.first();
       	if(message.content.startsWith(PREFIX)){
-    		const raw_team = message.content
-    		.trim()
-    		.substring(PREFIX.length)
-    		.split(/\s+/);
+		  		const raw_team = message.content
+		  		.trim()
+		  		.substring(PREFIX.length)
+		  		.split(/\s+/);
+				}else{
+					return message.channel.send(`Start your teams with !`);
+				}
 				
 				if(raw_team.length === 5) {
 					let id_arr = [];
