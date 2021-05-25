@@ -71,7 +71,7 @@ function submitFirstTeam(r_client, message, nick, d_team){
 						let version = results['version'];
 						delete results['version'];
 						let a_team = new Team(results, results.length);
-						if(team.num === -1) return message.channel.send("Invalid team: can't have duplicate characters.");
+						if(a_team.num === -1) return message.channel.send("Invalid team: can't have duplicate characters.");
 						let entry = a_team.units_str();
 						let version_entry = version + "_" + entry;
 						let team_obj = { entry:version , version_entry:"1_0" };
