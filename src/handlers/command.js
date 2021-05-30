@@ -41,7 +41,10 @@ function com(command, args, client, message, state){
 			});
 		}else if(command === 'test-react'){
 				// Use a promise to wait for the question to reach Discord first
-        message.channel.send('Which emoji do you prefer?').then((question) => {
+        message.channel.send('👍👎:Jun::Illya::Miyako::Kuka::Shizuru:\n' +
+        '     | Score: 12%' +
+        '😏😒| Lifetime supplies are good.' +
+        '👿😈| FUCK THIS COMP').then((question) => {
           // Have our bot guide the user by reacting with the correct reactions
           question.react('👍');
           question.react('👎');
@@ -53,20 +56,43 @@ function com(command, args, client, message, state){
     
           // Create the collector
           const collector = question.createReactionCollector(filter, {
+          	max: 2,
             time: 15000
           });
-    
+    			
+    			collector.on('collect', (collected, user) => {
+    				let emoji = collected.emoji.name;
+    				
+    				if(emoji === '👍'){
+    					message.channel.send('Liking the team!');
+    				}else if(emoji === '👎'){
+    					message.channel.send('Not liking the team!');
+    				}else if(emoji === '👿'){
+    					message.channel.send('Not liking the random comment!');
+    				}else if(emoji === '😈'){
+    					message.channel.send('Liking the random comment!');
+    				}else if(emoji === '😏'){
+    					message.channel.send('Liking the top comment!');
+    				}else if(emoji === '😒'){
+    					message.channel.send('Not liking the top comment!');
+    				}
+    			});
+    			
           collector.on('end', (collected, reason) => {
             if (reason === 'time') {
               message.reply('Ran out of time ☹...');
-            } else {
+            } /*else {
               // Grab the first reaction in the array
-              let userReaction = collected.array()[0];
+              let userReaction  = collected.array()[0];
+              let userReaction2 = null;
+              if(collected.array().length > 1){
+              	userReaction2 = collected.array()[1];
+              }
               // Grab the name of the reaction (which is the emoji itself)
               let emoji = userReaction._emoji.name;
     
               // Handle accordingly
-              if (emoji === '👍') {
+              if (emoji === '👍') { //👿😈😏😒
                 message.reply('Glad your reaction is 👍!');
               } else if (emoji === '👎') {
                 message.reply('Sorry your reaction is 👎');
@@ -74,7 +100,7 @@ function com(command, args, client, message, state){
                 // This should be filtered out, but handle it just in case
                 message.reply(`I dont understand ${emoji}...`);
               }
-            }
+            }*/
           });
         });
 		}
