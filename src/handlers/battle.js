@@ -98,7 +98,7 @@ function A_Teams(version){
 }
 
 
-function reMessMenu(r_client, message, nick, d_team, version, thoughts){
+function reMessMenu(r_client, message, nick, d_team, version, user, thoughts){
 	thoughts++;
 	message.channel.awaitMessages(user, {
 		  max: 1,
@@ -161,14 +161,14 @@ function reMessMenu(r_client, message, nick, d_team, version, thoughts){
 			return 5;
 		});
 	if(thoughts < 5){
-		reMessMenu(r_client, message, nick, d_team, version, thoughts);
+		reMessMenu(r_client, message, nick, d_team, version, user, thoughts);
 	}
 }
 
 function submitFirstTeam(r_client, message, nick, d_team, version){
 	let user = m => m.author.id === message.author.id
   message.channel.send(`No teams exist to defeat that team. Submit 5 units to add a new team.`).then(() => {
-		reMessMenu(r_client, message, nick, d_team, version, 0);
+		reMessMenu(r_client, message, nick, d_team, version, user, 0);
   })
 }
 
