@@ -41,10 +41,10 @@ function com(command, args, client, message, state){
 			});
 		}else if(command === 'test-react'){
 				// Use a promise to wait for the question to reach Discord first
-        message.channel.send('👍👎:Jun::Illya::Miyako::Kuka::Shizuru:\n' +
-        '     | Score: 12%\n' +
-        '😏😒| Lifetime supplies are good.\n' +
-        '👿😈| FUCK THIS COMP\n').then((question) => {
+        message.channel.send('👍👎 | :Jun::Illya::Miyako::Kuka::Shizuru:\n' +
+        '            | Score: 12%\n' +
+        '😏😒 | Lifetime supplies are good.\n' +
+        '👿😈 | FUCK THIS COMP\n').then((question) => {
           // Have our bot guide the user by reacting with the correct reactions
           question.react('👍');
           question.react('👎');
@@ -55,7 +55,7 @@ function com(command, args, client, message, state){
     			
           // Set a filter to ONLY grab those reactions & discard the reactions from the bot
           const filter = (reaction, user) => {
-            return ['👍', '👎'].includes(reaction.emoji.name) && user.id === message.author.id;
+            return ['👍', '👎', '😏', '😒', '😈', '👿'].includes(reaction.emoji.name) && user.id === message.author.id;
           };
     
           // Create the collector
