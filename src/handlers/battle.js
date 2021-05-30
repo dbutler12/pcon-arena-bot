@@ -101,6 +101,7 @@ function A_Teams(version){
 function submitFirstTeam(r_client, message, nick, d_team, version){
 	let user = m => m.author.id === message.author.id
   message.channel.send(`No teams exist to defeat that team. Submit 5 units to add a new team.`).then(() => {
+  	while(){
     message.channel.awaitMessages(user, {
         max: 1,
         time: 25000,
@@ -148,13 +149,18 @@ function submitFirstTeam(r_client, message, nick, d_team, version){
 							message.channel.send("Team added!");
 						});
 					});
+				}else if(raw_team[0] === 'quit'){
+					return message.channel.send("Leaving menu.");
+				}else if(raw_team[0] === 'life'){
+					message.channel.send("Staying in menu.");
 				}else{
 					message.channel.send("Invalid team.");
 				}
       })
       .catch(collected => {
-          message.channel.send('Timeout');
+          return message.channel.send('Timeout');
       });
+      }
   })
 }
 

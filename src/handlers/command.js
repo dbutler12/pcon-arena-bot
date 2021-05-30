@@ -33,9 +33,9 @@ function com(command, args, client, message, state){
 			r_client.zrangebyscore("lifetime", args[0], args[1], function(err, rep) { 		
 				message.channel.send(rep); 
 				console.log(rep);
-			});
-		}else if(command === 'test-range'){
-			r_client.zrange(-args[0], function(err,rep){
+			}); 
+		}else if(command === 'test-range'){ // Get the highest scored item in the set
+			r_client.zrange("lifetime", -1, -1, function(err,rep){
 				message.channel.send(rep);
 				console.log(rep);
 			});
