@@ -98,71 +98,77 @@ function A_Teams(version){
 }
 
 
+function reMessMenu(r_client, message, nick, d_team, version, thoughts){
+	thoughts++;
+	message.channel.awaitMessages(user, {
+		  max: 1,
+		  time: 25000,
+		  errors: ['time']
+		})
+		.then(message => {
+			const PREFIX = "!";
+			message = message.first();
+			if(message.content.startsWith(PREFIX)){
+				const raw_team = message.content
+				.trim()
+				.substring(PREFIX.length)
+				.split(/\s+/);
+			}else{
+				return message.channel.send(`Start your teams with !`);
+			}
+			
+			if(raw_team.length === 5) {
+				let id_arr = [];
+				for(let i = 0; i < raw_team.length; i++){
+					let char_str = raw_team[i].charAt(0).toUpperCase() + raw_team[i].substr(1).toLowerCase();
+					if(!(char_str in nick)){
+						return message.channel.send(`Char ${char_str} unknown.`);
+					}
+					id_arr.push(nick[char_str]);
+				}
+				r_client.multi().
+				hgetall(`char_data_${id_arr[0]}`).
+				hgetall(`char_data_${id_arr[1]}`).
+				hgetall(`char_data_${id_arr[2]}`).
+				hgetall(`char_data_${id_arr[3]}`).
+				hgetall(`char_data_${id_arr[4]}`).
+				exec(function(err,results){
+					let a_team = new Team(results, results.length);
+					if(a_team.num === -1) return message.channel.send("Invalid team: can't have duplicate characters.");
+					let entry = a_team.units_str();
+					let version_entry = version + "_" + entry;
+					let team_obj = { [entry]:version , [version_entry]:"1_0" };
+					//TODO: Add check to see if team exists, if so just make yes go up.
+					r_client.hmset(d_team.units_str(), team_obj, function(err, reply){
+						if(err){
+							console.log(err);
+							return message.channel.send("Unknown error. Please let an admin know what you did.");
+						}
+						message.channel.send("Team added!");
+					});
+				});
+			}else if(raw_team[0] === 'quit'){
+				message.channel.send("Leaving menu.");
+				return 5;
+			}else if(raw_team[0] === 'life'){
+				message.channel.send("Staying in menu.");
+			}else{
+				message.channel.send("Invalid team.");
+			}
+		})
+		.catch(collected => {
+			message.channel.send('Timeout');
+			return 5;
+		});
+	if(thoughts < 5){
+		reMessMenu(r_client, message, nick, d_team, version, thoughts);
+	}
+}
+
 function submitFirstTeam(r_client, message, nick, d_team, version){
 	let user = m => m.author.id === message.author.id
   message.channel.send(`No teams exist to defeat that team. Submit 5 units to add a new team.`).then(() => {
-  	let thoughts = 0;
-  	while(thoughts < 5){
-    message.channel.awaitMessages(user, {
-        max: 1,
-        time: 25000,
-        errors: ['time']
-      })
-      .then(message => {
-      	const PREFIX = "!";
-      	message = message.first();
-      	if(message.content.startsWith(PREFIX)){
-		  		const raw_team = message.content
-		  		.trim()
-		  		.substring(PREFIX.length)
-		  		.split(/\s+/);
-				}else{
-					return message.channel.send(`Start your teams with !`);
-				}
-				
-				if(raw_team.length === 5) {
-					let id_arr = [];
-					for(let i = 0; i < raw_team.length; i++){
-						let char_str = raw_team[i].charAt(0).toUpperCase() + raw_team[i].substr(1).toLowerCase();
-						if(!(char_str in nick)){
-							return message.channel.send(`Char ${char_str} unknown.`);
-						}
-						id_arr.push(nick[char_str]);
-					}
-					r_client.multi().
-					hgetall(`char_data_${id_arr[0]}`).
-					hgetall(`char_data_${id_arr[1]}`).
-					hgetall(`char_data_${id_arr[2]}`).
-					hgetall(`char_data_${id_arr[3]}`).
-					hgetall(`char_data_${id_arr[4]}`).
-					exec(function(err,results){
-						let a_team = new Team(results, results.length);
-						if(a_team.num === -1) return message.channel.send("Invalid team: can't have duplicate characters.");
-						let entry = a_team.units_str();
-						let version_entry = version + "_" + entry;
-						let team_obj = { [entry]:version , [version_entry]:"1_0" };
-						//TODO: Add check to see if team exists, if so just make yes go up.
-						r_client.hmset(d_team.units_str(), team_obj, function(err, reply){
-							if(err){
-								console.log(err);
-								return message.channel.send("Unknown error. Please let an admin know what you did.");
-							}
-							message.channel.send("Team added!");
-						});
-					});
-				}else if(raw_team[0] === 'quit'){
-					return message.channel.send("Leaving menu.");
-				}else if(raw_team[0] === 'life'){
-					message.channel.send("Staying in menu.");
-				}else{
-					message.channel.send("Invalid team.");
-				}
-      })
-      .catch(collected => {
-          return message.channel.send('Timeout');
-      });
-      thoughts++;
-      }
+		reMessMenu(r_client, message, nick, d_team, version, 0);
   })
 }
 
