@@ -101,7 +101,8 @@ function A_Teams(version){
 function submitFirstTeam(r_client, message, nick, d_team, version){
 	let user = m => m.author.id === message.author.id
   message.channel.send(`No teams exist to defeat that team. Submit 5 units to add a new team.`).then(() => {
-  	while(){
+  	let thoughts = 0;
+  	while(thoughts < 5){
     message.channel.awaitMessages(user, {
         max: 1,
         time: 25000,
@@ -160,6 +161,7 @@ function submitFirstTeam(r_client, message, nick, d_team, version){
       .catch(collected => {
           return message.channel.send('Timeout');
       });
+      thoughts++;
       }
   })
 }
