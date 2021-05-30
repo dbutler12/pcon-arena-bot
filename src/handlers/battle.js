@@ -139,6 +139,7 @@ function submitFirstTeam(r_client, message, nick, d_team, version){
 						let entry = a_team.units_str();
 						let version_entry = version + "_" + entry;
 						let team_obj = { [entry]:version , [version_entry]:"1_0" };
+						//TODO: Add check to see if team exists, if so just make yes go up.
 						r_client.hmset(d_team.units_str(), team_obj, function(err, reply){
 							if(err){
 								console.log(err);
