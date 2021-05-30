@@ -97,11 +97,22 @@ function A_Teams(version){
 	}
 }
 
-
+/*
 function reMessMenu(r_client, message, nick, d_team, version, user, thoughts){
 	thoughts++;
-	message.channel.awaitMessages(user, {
-		  max: 1,
+
+	if(thoughts < 5){
+		reMessMenu(r_client, message, nick, d_team, version, user, thoughts);
+	}
+}
+*/
+
+function submitFirstTeam(r_client, message, nick, d_team, version){
+	let user = m => m.author.id === message.author.id
+  message.channel.send(`No teams exist to defeat that team. Submit 5 units to add a new team.`).then(() => {
+		//reMessMenu(r_client, message, nick, d_team, version, user, 0);
+		message.channel.awaitMessages(user, {
+		  max: 5,
 		  time: 25000,
 		  errors: ['time']
 		})
@@ -114,7 +125,7 @@ function reMessMenu(r_client, message, nick, d_team, version, user, thoughts){
 				.substring(PREFIX.length)
 				.split(/\s+/);
 			}else{
-				return message.channel.send(`Start your teams with !`);
+				return 5;
 			}
 			
 			if(raw_team.length === 5) {
@@ -148,8 +159,7 @@ function reMessMenu(r_client, message, nick, d_team, version, user, thoughts){
 					});
 				});
 			}else if(raw_team[0] === 'quit'){
-				message.channel.send("Leaving menu.");
-				return 5;
+				return message.channel.send("Leaving menu.");
 			}else if(raw_team[0] === 'life'){
 				message.channel.send("Staying in menu.");
 			}else{
@@ -157,18 +167,9 @@ function reMessMenu(r_client, message, nick, d_team, version, user, thoughts){
 			}
 		})
 		.catch(collected => {
-			message.channel.send('Timeout');
-			return 5;
+			console.log(collected);
+			return message.channel.send('Timeout');
 		});
-	if(thoughts < 5){
-		reMessMenu(r_client, message, nick, d_team, version, user, thoughts);
-	}
-}
-
-function submitFirstTeam(r_client, message, nick, d_team, version){
-	let user = m => m.author.id === message.author.id
-  message.channel.send(`No teams exist to defeat that team. Submit 5 units to add a new team.`).then(() => {
-		reMessMenu(r_client, message, nick, d_team, version, user, 0);
   })
 }
 
