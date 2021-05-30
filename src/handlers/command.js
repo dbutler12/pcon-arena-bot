@@ -39,34 +39,44 @@ function com(command, args, client, message, state){
 				message.channel.send(rep);
 				console.log(rep);
 			});
-		}else if(command === 'check'){
-			r_client.get('cur_char_id', function(err, val) {
-				message.channel.send(`Char id available: ${val}`);
-			});
-			
-			r_client.hgetall('char_nick', function(err, nick) {
-				message.channel.send("Char data:");
-		 		var str = "";
-		  	for(const name in nick) {
-		  		str = `Name: ${name}  ID: ${nick[name]}` + "\n";
-		  		message.channel.send(str);
-		  		
-		  		r_client.hgetall(`char_data_${nick[name]}`, function(err, data){
-				 		var str = "";
-						for (const property in data) {
-							str = str + `${property}: ${data[property]}` + "\n";
-						}
-						message.channel.send(str);
-					});
-				}
-			});
-			
-			r_client.multi().
-			hgetall('char_data_0').
-			hgetall('char_data_1').
-			exec(function(err, results){
-				message.channel.send(results[0]['position']);
-			});
+		}else if(command === 'test-react'){
+				// Use a promise to wait for the question to reach Discord first
+        message.channel.send('Which emoji do you prefer?').then((question) => {
+          // Have our bot guide the user by reacting with the correct reactions
+          question.react('👍');
+          question.react('👎');
+    
+          // Set a filter to ONLY grab those reactions & discard the reactions from the bot
+          const filter = (reaction, user) => {
+            return ['👍', '👎'].includes(reaction.emoji.name) && user.id === message.author.id;
+          };
+    
+          // Create the collector
+          const collector = question.createReactionCollector(filter, {
+            time: 15000
+          });
+    
+          collector.on('end', (collected, reason) => {
+            if (reason === 'time') {
+              message.reply('Ran out of time ☹...');
+            } else {
+              // Grab the first reaction in the array
+              let userReaction = collected.array()[0];
+              // Grab the name of the reaction (which is the emoji itself)
+              let emoji = userReaction._emoji.name;
+    
+              // Handle accordingly
+              if (emoji === '👍') {
+                message.reply('Glad your reaction is 👍!');
+              } else if (emoji === '👎') {
+                message.reply('Sorry your reaction is 👎');
+              } else {
+                // This should be filtered out, but handle it just in case
+                message.reply(`I dont understand ${emoji}...`);
+              }
+            }
+          });
+        });
 		}
 	}
 	
