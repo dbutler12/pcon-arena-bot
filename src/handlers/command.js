@@ -34,6 +34,11 @@ function com(command, args, client, message, state){
 				message.channel.send(rep); 
 				console.log(rep);
 			});
+		}else if(command === 'test-range'){
+			r_client.zrange(-args[0], function(err,rep){
+				message.channel.send(rep);
+				console.log(rep);
+			});
 		}else if(command === 'check'){
 			r_client.get('cur_char_id', function(err, val) {
 				message.channel.send(`Char id available: ${val}`);
