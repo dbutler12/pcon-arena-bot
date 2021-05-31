@@ -6,6 +6,15 @@ r_client.on('connect', function() {
 const bat_h  = require('./battle');
 const meta_h = require('./meta');
 
+
+async function tester(){
+	const { promisify } = require('util');
+	const getAsync = promisify(r_client.get).bind(r_client);
+	
+	let char_id = await getAsync('cur_char_id');
+	return char_id;
+}
+
 function com(command, args, client, message, state){
 	if(message.author.tag === 'Fengtorin#5328'){
 		if(command === 'restart'){
@@ -39,12 +48,14 @@ function com(command, args, client, message, state){
 				message.channel.send(rep);
 				console.log(rep);
 			});
+		}else if(command === 'test-asyn'){
+			tester().then(console.log);
 		}else if(command === 'test-react'){
 				// Use a promise to wait for the question to reach Discord first
-        message.channel.send('👍👎 | :Jun::Illya::Miyako::Kuka::Shizuru:\n' +
-        '            | Score: 12%\n' +
-        '😏😒 | Lifetime supplies are good.\n' +
-        '👿😈 | FUCK THIS COMP\n').then((question) => {
+        message.channel.send('👍 👎 | :Jun::Illya::Miyako::Kuka::Shizuru:\n' +
+        '             | Score: 12%\n' +
+        '😏 😒 | Lifetime supplies are good.\n' +
+        '😈 👿 | FUCK THIS COMP\n').then((question) => {
           // Have our bot guide the user by reacting with the correct reactions
           question.react('👍');
           question.react('👎');
