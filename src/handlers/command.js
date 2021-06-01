@@ -107,16 +107,13 @@ async function makeTeam(r_client, message, nick, raw_team, version){
           message.channel.send('Timeout');
       });
   })
-*/
 }
+*/
 
 
 async function tester(r_client, args){
 	const { promisify } = require('util');
 	const getAsync = promisify(r_client.hgetall).bind(r_client);
-	
-	let nick = await getAsync('char_nick');
-	return char_id;
 	
 	let id_arr = [];
 	for(let i = 0; i < args.length; i++){
@@ -173,7 +170,7 @@ function com(command, args, client, message, state){
 				console.log(rep);
 			});
 		}else if(command === 'test-asyn'){
-			tester().then(console.log);
+			tester(r_client, args).then(console.log);
 		}else if(command === 'test-react'){
 				// Use a promise to wait for the question to reach Discord first
         message.channel.send('👍 👎 | :Jun::Illya::Miyako::Kuka::Shizuru:\n' +
