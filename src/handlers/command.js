@@ -7,6 +7,12 @@ const bat_h  = require('./battle');
 const meta_h = require('./meta');
 
 
+function Unit(name, position){
+	this.name = name;
+	this.position = position;
+}
+
+
 function Team(data, num){
 	this.num = num;
 	this.units = [];
@@ -115,6 +121,8 @@ async function tester(r_client, args){
 	const { promisify } = require('util');
 	const getAsync = promisify(r_client.hgetall).bind(r_client);
 	
+	let nick = await getAsync('char_nick');
+	
 	let id_arr = [];
 	for(let i = 0; i < args.length; i++){
 		let char_str = args[i].charAt(0).toUpperCase() + args[i].substr(1).toLowerCase();
@@ -127,7 +135,7 @@ async function tester(r_client, args){
 	const units = [];
 	
 	for(let i = 0; i < 5; i++){
-		units.push(getAsync(`char_data_${id_arr[i]}`));
+		units.push(await getAsync(`char_data_${id_arr[i]}`));
 	}
 	let a_team = new Team(units, units.length);
 	if(a_team.num === -1) return message.channel.send("Invalid team: can't have duplicate characters.");
