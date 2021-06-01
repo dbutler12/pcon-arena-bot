@@ -124,21 +124,19 @@ async function tester(r_client, args){
 	let nick = await getAsync('char_nick');
 	
 	let args2 = ["arisa", "saren", "ninon", "tamaki", "jun"];
-	console.log(args);
-	console.log(args2);
+
 	let id_arr = [];
 	let id_arr2 = [];
 	for(let i = 0; i < args.length; i++){
 		let char_str = args[i].charAt(0).toUpperCase() + args[i].substr(1).toLowerCase();
-		let char_str2 = args2[i].charAt(0).toUpperCase() + args[i].substr(1).toLowerCase();
+		let char_str2 = args2[i].charAt(0).toUpperCase() + args2[i].substr(1).toLowerCase();
 		if(!(char_str in nick)){
 			return message.channel.send(`Char ${char_str} unknown.`);
 		}
 		id_arr.push(nick[char_str]);
 		id_arr2.push(nick[char_str2]);
 	}
-	console.log(id_arr);
-	console.log(id_arr2);
+
 	const units = [];
 	const units2 = [];
 	
@@ -146,8 +144,7 @@ async function tester(r_client, args){
 		units.push(await getAsync(`char_data_${id_arr[i]}`));
 		units2.push(await getAsync(`char_data_${id_arr2[i]}`));
 	}
-	console.log(units);
-	console.log(units2);
+
 	let a_team = new Team(units, units.length);
 	if(a_team.num === -1) return message.channel.send("Invalid team: can't have duplicate characters.");
 	let b_team = new Team(units2, units2.length);
