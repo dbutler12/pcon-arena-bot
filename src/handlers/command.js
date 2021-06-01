@@ -13,13 +13,29 @@ function Unit(name, position){
 }
 
 
-function Team(data, num){
+function Team(data, num, team2 = null, team3 = null){
 	this.num = num;
 	this.units = [];
 	
+	this.check = function(unit) {
+		if(team2 !== null){
+			if(team2[unit['name']] === true) return false;
+		}
+		
+		if(team3 !== null){
+			if(team3[unit['name']] === true) return false;
+		}
+		
+		return true;
+	}
+	
 	this.init = function() {
 		let unit = new Unit(data[0]['name'], data[0]['position']);
+		if(!this.check(unit)){
+			return console.log(`Cannot make team. Unit ${data[0]['name']} already in previous team.`);
+		}
 		this.units[0] = unit;
+		this[unit['name']] = true;
 		
 		for(let i = 1; i < this.num; i++){
 			let cur = new Unit(data[i]['name'], data[i]['position']);
@@ -29,12 +45,14 @@ function Team(data, num){
 					this.units[j+1] = this.units[j];
 					if(j === 0){
 						this.units[j] = cur;
+						this[cur['name']] = true;
 					}
 				}else if(this.units[j]['position'] < cur['position']){ // Invalid team
 					this.num = -1
 					return;
 				}else{
 					this.units[j + 1] = cur;
+					this[cur['name']] = true;
 					break;
 				}
 			}
@@ -147,7 +165,7 @@ async function tester(r_client, args){
 
 	let a_team = new Team(units, units.length);
 	if(a_team.num === -1) return message.channel.send("Invalid team: can't have duplicate characters.");
-	let b_team = new Team(units2, units2.length);
+	let b_team = new Team(units2, units2.length, a_team);
 	
 	console.log(a_team);
 	console.log(b_team);
