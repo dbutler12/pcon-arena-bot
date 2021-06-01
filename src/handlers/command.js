@@ -7,13 +7,137 @@ const bat_h  = require('./battle');
 const meta_h = require('./meta');
 
 
-async function tester(){
+function Team(data, num){
+	this.num = num;
+	this.units = [];
+	
+	this.init = function() {
+		let unit = new Unit(data[0]['name'], data[0]['position']);
+		this.units[0] = unit;
+		
+		for(let i = 1; i < this.num; i++){
+			let cur = new Unit(data[i]['name'], data[i]['position']);
+			
+			for(let j = i - 1; j >= 0; j--){
+				if(this.units[j]['position'] < cur['position']){
+					this.units[j+1] = this.units[j];
+					if(j === 0){
+						this.units[j] = cur;
+					}
+				}else if(this.units[j]['position'] < cur['position']){ // Invalid team
+					this.num = -1
+					return;
+				}else{
+					this.units[j + 1] = cur;
+					break;
+				}
+			}
+		}
+	}
+	
+	this.units_str = function(){
+		return this.units.map(u => u.name).join('_');
+	}
+	
+	this.init();
+}
+
+/*
+async function makeTeam(r_client, message, nick, raw_team, version){
 	const { promisify } = require('util');
 	const getAsync = promisify(r_client.get).bind(r_client);
 	
-	let char_id = await getAsync('cur_char_id');
-	return char_id;
+	if(raw_team.length === 5) {
+		let id_arr = [];
+		for(let i = 0; i < raw_team.length; i++){
+			let char_str = raw_team[i].charAt(0).toUpperCase() + raw_team[i].substr(1).toLowerCase();
+			if(!(char_str in nick)){
+				return message.channel.send(`Char ${char_str} unknown.`);
+			}
+			id_arr.push(nick[char_str]);
+		}
+		r_client.multi().
+		hgetall(`char_data_${id_arr[0]}`).
+		hgetall(`char_data_${id_arr[1]}`).
+		hgetall(`char_data_${id_arr[2]}`).
+		hgetall(`char_data_${id_arr[3]}`).
+		hgetall(`char_data_${id_arr[4]}`).
+		exec(function(err,results){
+			let a_team = new Team(results, results.length);
+			if(a_team.num === -1) return message.channel.send("Invalid team: can't have duplicate characters.");
+			let entry = a_team.units_str();
+			let version_entry = version + "_" + entry;
+			let team_obj = { [entry]:version , [version_entry]:"1_0" };
+			//TODO: Add check to see if team exists, if so just make yes go up.
+			r_client.hmset(d_team.units_str(), team_obj, function(err, reply){
+				if(err){
+					console.log(err);
+					return message.channel.send("Unknown error. Please let an admin know what you did.");
+				}
+				message.channel.send("Team added!");
+			});
+		});
+	}else{
+		message.channel.send("Invalid team.");
+	}
+*/
+
+/*
+// Get user input method
+	let user = m => m.author.id === message.author.id;
+  message.channel.send(`No teams exist to defeat that team. Submit 5 units to add a new team.`).then(() => {
+    message.channel.awaitMessages(user, {
+        max: 1,
+        time: 25000,
+        errors: ['time']
+      })
+      .then(message => {
+      	const PREFIX = "!";
+      	message = message.first();
+      	if(message.content.startsWith(PREFIX)){
+		  		const raw_team = message.content
+		  		.trim()
+		  		.substring(PREFIX.length)
+		  		.split(/\s+/);
+				}
+				
+
+      })
+      .catch(collected => {
+          message.channel.send('Timeout');
+      });
+  })
+*/
 }
+
+
+async function tester(r_client, args){
+	const { promisify } = require('util');
+	const getAsync = promisify(r_client.hgetall).bind(r_client);
+	
+	let nick = await getAsync('char_nick');
+	return char_id;
+	
+	let id_arr = [];
+	for(let i = 0; i < args.length; i++){
+		let char_str = args[i].charAt(0).toUpperCase() + args[i].substr(1).toLowerCase();
+		if(!(char_str in nick)){
+			return message.channel.send(`Char ${char_str} unknown.`);
+		}
+		id_arr.push(nick[char_str]);
+	}
+	
+	const units = [];
+	
+	for(let i = 0; i < 5; i++){
+		units.push(getAsync(`char_data_${id_arr[i]}`));
+	}
+	let a_team = new Team(units, units.length);
+	if(a_team.num === -1) return message.channel.send("Invalid team: can't have duplicate characters.");
+	console.log(a_team);
+	return a_team;
+}
+
 
 function com(command, args, client, message, state){
 	if(message.author.tag === 'Fengtorin#5328'){
