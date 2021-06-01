@@ -137,14 +137,16 @@ async function tester(r_client, args){
 	for(let i = 0; i < 5; i++){
 		units.push(await getAsync(`char_data_${id_arr[i]}`));
 	}
-	let a_team = new Team(units, units.length);
-	if(a_team.num === -1) return message.channel.send("Invalid team: can't have duplicate characters.");
-	console.log(a_team);
-	return a_team;
+	//let a_team = new Team(units, units.length);
+	//if(a_team.num === -1) return message.channel.send("Invalid team: can't have duplicate characters.");
+	return new Promise(resolve => {
+		const a_team = new Team(units, units.length);
+		resolve(a_team);
+	});
 }
 
 
-function com(command, args, client, message, state){
+async function com(command, args, client, message, state){
 	if(message.author.tag === 'Fengtorin#5328'){
 		if(command === 'restart'){
 			console.log(`${message.author.tag} is requesting restart from task-bot`);
@@ -178,7 +180,8 @@ function com(command, args, client, message, state){
 				console.log(rep);
 			});
 		}else if(command === 'test-asyn'){
-			tester(r_client, args).then(console.log);
+			let team = await tester(r_client, args);
+			message.channel.send(team);
 		}else if(command === 'test-react'){
 				// Use a promise to wait for the question to reach Discord first
         message.channel.send('👍 👎 | :Jun::Illya::Miyako::Kuka::Shizuru:\n' +
