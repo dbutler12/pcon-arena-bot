@@ -5,7 +5,7 @@ r_client.on('connect', function() {
 });
 const bat_h  = require('./battle');
 const meta_h = require('./meta');
-const units  = require('../../units');
+const units  = require('../units');
 
 
 async function tester(r_client, args){

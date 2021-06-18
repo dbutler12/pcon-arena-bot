@@ -1,4 +1,4 @@
-const units  = require('../../units');
+const units  = require('../units');
 
 function addComment(r_client, message, version, def_team, off_team, user){
 
