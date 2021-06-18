@@ -1,12 +1,39 @@
 function updateVer(r_client, version){
-	r_client.set('version', version, function(err, reply){
-		console.log(`Version set: ${reply}`);
+	r_client.multi().
+	get('cur_version').
+	get('prev_version').
+	get('dead_version').
+	exec(function(err, results) {
+		if(results[0] === null){
+			r_client.set('cur_version', version, function(err, reply){
+				console.log(`Current version set: ${reply}`);
+			});
+		}else if(results[1] === null){
+			r_client.set('cur_version', version, function(err, reply){
+				console.log(`Current version set: ${reply}`);
+			});
+			r_client.set('prev_version', results[0], function(err, reply){
+				console.log(`Prev version set: ${reply}`);
+			});
+		}else{
+			r_client.set('cur_version', version, function(err, reply){
+				console.log(`Current version set: ${reply}`);
+			});
+			r_client.set('prev_version', results[0], function(err, reply){
+				console.log(`Prev version set: ${reply}`);
+			});
+			r_client.set('dead_version', results[1], function(err, reply){
+				console.log(`Dead version set: ${reply}`);
+			});
+			
+			//TODO: Add dead version cleanup on results[2] if it's not null
+		}
 	});
 }
 
 
-function getVer(r_client, message){
-	r_client.get('version', function(err, reply){
+function getVer(r_client, message, level = 'cur_'){
+	r_client.get(level+'version', function(err, reply){
 		message.channel.send(`Princess Connect Version: ${reply}`);
 	});
 }

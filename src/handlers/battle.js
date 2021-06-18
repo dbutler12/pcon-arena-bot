@@ -1,100 +1,27 @@
-function Unit(name, position){
-	this.name = name;
-	this.position = position;
-}
+import Unit from "../units";
+import Team from "../units";
 
-function Team(data, num){
-	this.num = num;
-	this.units = [];
-	
-	this.init = function() {
-		let unit = new Unit(data[0]['name'], data[0]['position']);
-		this.units[0] = unit;
-		
-		for(let i = 1; i < this.num; i++){
-			let cur = new Unit(data[i]['name'], data[i]['position']);
-			
-			for(let j = i - 1; j >= 0; j--){
-				if(this.units[j]['position'] < cur['position']){
-					this.units[j+1] = this.units[j];
-					if(j === 0){
-						this.units[j] = cur;
-					}
-				}else if(this.units[j]['position'] < cur['position']){ // Invalid team
-					this.num = -1
-					return;
-				}else{
-					this.units[j + 1] = cur;
-					break;
-				}
-			}
-		}
-	}
-	
-	this.units_str = function(){
-		return this.units.map(u => u.name).join('_');
-	}
-	
-	this.init();
+function addComment(r_client, message, version, def_team, off_team, user){
+
 }
 
 
-function A_Teams(version){
-	this.version = version;
-	this.num = 0;
-	
-	this.addTeam = function(team, y_n){
-		this[this.num] = team;
-		this[team] = y_n;
-		this.num++;
-	}
-	
-	this.getVal = function(value, on){
-		if(on === 'ratio'){
-			return parseInt(value[0])/parseInt(value[2]);
-		}else if(on === 'y'){
-			return parseInt(value[0]);
+function createIDArray(chars, nick){
+	let id_arr = [];
+	let id_dup = {}; // Duplicate character checker, to avoid calling redis if invalid team
+	for(let i = 0; i < chars.length; i++){
+		let char_str = chars[i].charAt(0).toUpperCase() + chars[i].substr(1).toLowerCase();
+		if(!(char_str in nick)){
+			return message.channel.send(`Char ${char_str} unknown.`);
 		}
-	}
-	
-	// example properties
-	// this[0] = Jun_Miyako_Kuka_Ilya_Hiyori
-	// this["Jun_Miyako_Kuka_Ilya_Hiyori"] = 5_12
-	
-	this.filt_str = function(on){
-		if(this.num == 1){
-			let y_n = this[this[0]].split("_");
-			let team = this[0].split("_");
-			return ":" + team.join("::") + ":  " + "YES:" + y_n[0] + " NO:" + y_n[1];
-		}else{
-			let arr = [];
-			let value = this.getVal(this[this[0]],on);
-	 		arr[0] = { team:this[0], val:value };
-	 		for(let i = 1; i < this.num; i++){
-	 			let cur_val = this.getVal(this[this[i]],on);
-				let cur = { team:this[i], val:cur_val };
-				
-				for(let j = i - 1; j >= 0; j--){
-					if(arr[j].val < cur.val){
-						arr[j + 1] = arr[j];
-						if(j === 0){
-							arr[j] = cur;
-						}
-					}else{
-						arr[j + 1] = cur;
-						break;
-					}
-				}
-			}
+		let id = nick[char_str];
+		if(id_dup[id]){
+			return message.channel.send(`Invalid team: can't have duplicate character ${char_str}.`);
 		}
-		let str = "";
-		for(let i = 0; i < this.num; i++){
-			let team = arr[i].team.split("_");
-			let y_n = this[arr[i].team];
-			str = str + ":" + team.join("::") + ":  " + "YES:" + y_n[0] + " NO:" + y_n[1] + "\n";
-		}
-		return str;
+		id_dup[id] = true;
+		id_arr.push(id);
 	}
+	return id_arr;
 }
 
 
@@ -117,14 +44,8 @@ function submitFirstTeam(r_client, message, nick, d_team, version){
 				}
 				
 				if(raw_team.length === 5) {
-					let id_arr = [];
-					for(let i = 0; i < raw_team.length; i++){
-						let char_str = raw_team[i].charAt(0).toUpperCase() + raw_team[i].substr(1).toLowerCase();
-						if(!(char_str in nick)){
-							return message.channel.send(`Char ${char_str} unknown.`);
-						}
-						id_arr.push(nick[char_str]);
-					}
+					let id_arr = createIDArray(raw_team, nick);
+
 					r_client.multi().
 					hgetall(`char_data_${id_arr[0]}`).
 					hgetall(`char_data_${id_arr[1]}`).
@@ -132,10 +53,10 @@ function submitFirstTeam(r_client, message, nick, d_team, version){
 					hgetall(`char_data_${id_arr[3]}`).
 					hgetall(`char_data_${id_arr[4]}`).
 					exec(function(err,results){
-						let a_team = new Team(results, results.length);
-						if(a_team.num === -1) return message.channel.send("Invalid team: can't have duplicate characters.");
-						let entry = a_team.units_str();
-						let version_entry = version + "_" + entry;
+						let off_team = new Team(results, results.length);
+						let version_entry = version + "-" + off_team.units_str();
+						
+						//TODO: Add to sorted set
 						let team_obj = { [entry]:version , [version_entry]:"1_0" };
 						//TODO: Add check to see if team exists, if so just make yes go up.
 						r_client.hmset(d_team.units_str(), team_obj, function(err, reply){
@@ -156,37 +77,39 @@ function submitFirstTeam(r_client, message, nick, d_team, version){
   })
 }
 
+// Layered functions:
+// First is nicknames to generate array of ids
+// Second is 
 // Add support to get a count for results
 // Add support to view all
 // Add support to view only unpopular results
 function battle(r_client, message, args){
 	let tot_cnt = 10;
-	r_client.hgetall('char_nick', function(err, nick) {
-		let id_arr = [];
-		for(let i = 0; i < args.length; i++){
-			let char_str = args[i].charAt(0).toUpperCase() + args[i].substr(1).toLowerCase();
-			if(!(char_str in nick)){
-				return message.channel.send(`Char ${char_str} unknown.`);
-			}
-			id_arr.push(nick[char_str]);
-		}
+	r_client.hgetall('char_nick', async function(err, nick) {
+		const { promisify } = require('util');
+		const getAsync = promisify(r_client.get).bind(r_client);
+	
+		let ver = [];
+		ver[0] = await getAsync('cur_version');
+		ver[1] = await getAsync('prev_version');
+		ver[2] = await getAsync('dead_version');
+	
+		let id_arr = createIDArray(args, nick);
+		
 		r_client.multi().
 		hgetall(`char_data_${id_arr[0]}`).
 		hgetall(`char_data_${id_arr[1]}`).
 		hgetall(`char_data_${id_arr[2]}`).
 		hgetall(`char_data_${id_arr[3]}`).
 		hgetall(`char_data_${id_arr[4]}`).
-		get('version').
 		exec(function(err,results){
-			let version = results[results.length - 1];
 			let team = new Team(results, results.length - 1);
-			if(team.num === -1) return message.channel.send("Invalid team: can't have duplicate characters.");
 		
 			r_client.hgetall(team.units_str(), function(err, results){
 				if(results === null){ // No teams exist!
-					submitFirstTeam(r_client, message, nick, team, version);
+					submitFirstTeam(r_client, message, nick, team, ver[0]);
 				}else{ // Teams exist!
-					let cur_ver = new A_Teams(version);
+					let cur_ver = new Off_Teams(ver);
 					
 					for(const r in results){ // All the submitted teams
 						const c = r.charAt(0);
