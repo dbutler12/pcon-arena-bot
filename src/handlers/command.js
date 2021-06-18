@@ -5,10 +5,7 @@ r_client.on('connect', function() {
 });
 const bat_h  = require('./battle');
 const meta_h = require('./meta');
-import Unit from "../units";
-import Team from "../units";
-
-
+const units  = require('../units');
 
 
 async function tester(r_client, args){
@@ -39,9 +36,9 @@ async function tester(r_client, args){
 		units2.push(await getAsync(`char_data_${id_arr2[i]}`));
 	}
 
-	let a_team = new Team(units, units.length);
+	let a_team = new units.Team(units, units.length);
 	if(a_team.num === -1) return message.channel.send("Invalid team: can't have duplicate characters.");
-	let b_team = new Team(units2, units2.length, a_team);
+	let b_team = new units.Team(units2, units2.length, a_team);
 	
 	console.log(a_team);
 	console.log(b_team);

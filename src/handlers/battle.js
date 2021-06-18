@@ -1,5 +1,4 @@
-import Unit from "../units";
-import Team from "../units";
+const units  = require('../units');
 
 function addComment(r_client, message, version, def_team, off_team, user){
 
@@ -53,7 +52,7 @@ function submitFirstTeam(r_client, message, nick, d_team, version){
 					hgetall(`char_data_${id_arr[3]}`).
 					hgetall(`char_data_${id_arr[4]}`).
 					exec(function(err,results){
-						let off_team = new Team(results, results.length);
+						let off_team = new units.Team(results, results.length);
 						let version_entry = version + "-" + off_team.units_str();
 						
 						//TODO: Add to sorted set
@@ -103,7 +102,7 @@ function battle(r_client, message, args){
 		hgetall(`char_data_${id_arr[3]}`).
 		hgetall(`char_data_${id_arr[4]}`).
 		exec(function(err,results){
-			let team = new Team(results, results.length - 1);
+			let team = new units.Team(results, results.length - 1);
 		
 			r_client.hgetall(team.units_str(), function(err, results){
 				if(results === null){ // No teams exist!
