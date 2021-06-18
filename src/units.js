@@ -122,4 +122,4 @@ function Off_Teams(version){
 }
 
 
-module.exports = { Unit, Team, Off_Teams };
+module.exports = { Unit: Unit, Team: Team, Off_Teams: Off_Teams };
