@@ -69,9 +69,13 @@ function com(command, args, client, message, state){
 		}else if(command === 'add-sort'){
 			r_client.zadd('lifetime', 100*Math.random(), args[0]);
 		}else if(command === 'test-sort'){
-			r_client.zrangebyscore("lifetime", args[0], args[1], function(err, rep) { 		
-				message.channel.send(rep); 
-				console.log(rep);
+			r_client.zrevrangebyscore("lifetime", args[1], args[0], "withscores", function(err, rep){ 	
+				if(rep.length === 0){
+					message.channel.send("Empty");
+				}else{
+					message.channel.send(rep); 
+					console.log(rep);
+				}
 			}); 
 		}else if(command === 'test-range'){ // Get the highest scored item in the set
 			r_client.zrange("lifetime", -1, -1, function(err,rep){

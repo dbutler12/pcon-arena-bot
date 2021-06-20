@@ -63,61 +63,39 @@ function Team(data, num, team2 = null, team3 = null){
 
 
 // List of offensive teams
-function Off_Teams(version){
-	this.version = version;
+function Off_Teams(a_team){
+	this.against = a_team; // This is the team that the offense is built against
 	this.num = 0;
 	
-	this.addTeam = function(team, y_n){
-		this[this.num] = team;
-		this[team] = y_n;
+	this.addTeam = function(team, score, version){
+		this[this.num] = {team: team, score: score, version: version};
 		this.num++;
 	}
 	
-	this.getVal = function(value, on){
-		if(on === 'ratio'){
-			return parseInt(value[0])/parseInt(value[2]);
-		}else if(on === 'y'){
-			return parseInt(value[0]);
-		}
+	this.getVal = function(num){
+		return this[this[num]];
 	}
 	
 	// example properties
 	// this[0] = Jun_Miyako_Kuka_Ilya_Hiyori
-	// this["Jun_Miyako_Kuka_Ilya_Hiyori"] = 5_12
+	// this["Jun_Miyako_Kuka_Ilya_Hiyori"] = 512
 	
-	this.filt_str = function(on){
+	this.teamStr = function(num){
+		let data = this[this[num]];
+		let team = data.team.split("_");
+		return ":" + team.join("::") + ":  " + "Score:" data.score + " V" + data.version;
+	}
+	
+	this.filtStr = function(){
 		if(this.num == 1){
-			let y_n = this[this[0]].split("_");
-			let team = this[0].split("_");
-			return ":" + team.join("::") + ":  " + "YES:" + y_n[0] + " NO:" + y_n[1];
+			return [this.teamStr(0)];
 		}else{
 			let arr = [];
-			let value = this.getVal(this[this[0]],on);
-	 		arr[0] = { team:this[0], val:value };
-	 		for(let i = 1; i < this.num; i++){
-	 			let cur_val = this.getVal(this[this[i]],on);
-				let cur = { team:this[i], val:cur_val };
-				
-				for(let j = i - 1; j >= 0; j--){
-					if(arr[j].val < cur.val){
-						arr[j + 1] = arr[j];
-						if(j === 0){
-							arr[j] = cur;
-						}
-					}else{
-						arr[j + 1] = cur;
-						break;
-					}
-				}
-			}
-		}
-		let str = "";
-		for(let i = 0; i < this.num; i++){
-			let team = arr[i].team.split("_");
-			let y_n = this[arr[i].team];
-			str = str + ":" + team.join("::") + ":  " + "YES:" + y_n[0] + " NO:" + y_n[1] + "\n";
-		}
-		return str;
+	 		for(let i = 0; i < this.num; i++){
+	 			arr[i] = this.teamStr(i);
+	 		}
+	 		return arr;
+	 	}
 	}
 }
 

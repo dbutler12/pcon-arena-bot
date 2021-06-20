@@ -1,4 +1,4 @@
-const units  = require('../units');
+const Units  = require('../units');
 
 function addComment(r_client, message, version, def_team, off_team, user){
 
@@ -24,9 +24,15 @@ function createIDArray(chars, nick){
 }
 
 
-function submitFirstTeam(r_client, message, nick, d_team, version){
+
+function createScoreStr(def_str, off_str, version){
+	return version + "-" + def_str + "-" + off_str + "-score";
+}
+
+
+function submitFirstTeam(r_client, message, nick, def_team, version){
 	let user = m => m.author.id === message.author.id;
-  message.channel.send(`No teams exist to defeat that team. Submit 5 units to add a new team.`).then(() => {
+  message.channel.send(`No teams exist to defeat that team. If you want to add a team: Submit 5 units to add a new team. Example: !add Io Shinobu Suzume Ilya Aoi.`).then(() => {
     message.channel.awaitMessages(user, {
         max: 1,
         time: 25000,
@@ -52,29 +58,88 @@ function submitFirstTeam(r_client, message, nick, d_team, version){
 					hgetall(`char_data_${id_arr[3]}`).
 					hgetall(`char_data_${id_arr[4]}`).
 					exec(function(err,results){
-						let off_team = new units.Team(results, results.length);
+						let off_team = new Units.Team(results, results.length);
 						let version_entry = version + "-" + off_team.units_str();
 						
-						//TODO: Add to sorted set
-						let team_obj = { [entry]:version , [version_entry]:"1_0" };
-						//TODO: Add check to see if team exists, if so just make yes go up.
-						r_client.hmset(d_team.units_str(), team_obj, function(err, reply){
-							if(err){
-								console.log(err);
-								return message.channel.send("Unknown error. Please let an admin know what you did.");
-							}
-							message.channel.send("Team added!");
+						//TODO: Remake data structures
+						//Add to sorted set chars_defense_team: chars_offense_team
+						let off_str = off_team.units_str();
+						let def_str = def_team.units_str();
+						let score_str = createScoreStr(def_str, off_str, version);
+						
+						r_client.zadd(def_str, 100, off_str); // Team added to sorted set
+						
+						// Add version data for team to string
+						r_client.set(off_str + "-" + def_str, version, function(err, reply){
+							console.log(`New team set: ${off_str}-${def_str}:${reply}`);
 						});
-					});
+						
+						// Add to version-defense-offense-score: [y or n]-user_tag
+						r_client.sadd([score_str, "y-" + message.author.tag], function(err, reply) {
+							if(err){
+								console.log("First team scoring sadd err:" + err);
+							}
+						}); // User tag added for scoring purposes
+						
+						// Add to version-master set
+						r_client.sadd([version+'-master', score_str], function(err, reply) {
+							if(err){
+								console.log("First team version master sadd err:" + err);
+							}
+						});
+						
+						message.channel.send("Team added!");
+						
+						
+						
+						message.channel.send(`If you would like to add a comment to this team, use !com Comment Example: !com Team only works with 4*+ Io.`).then(() => {
+						message.channel.awaitMessages(user, {
+								max: 1,
+								time: 25000,
+								errors: ['time']
+							})
+							.then(message => {
+								const PREFIX = "!";
+								message = message.first();
+								if(message.content.startsWith(PREFIX)){
+									const raw_comment = message.content
+									.trim()
+									.substring(PREFIX.length);
+									
+									let [command, ...comment] = raw_comment.split(/\s+/);
+									comment = comment.join(/\s+/);
+									
+									if(command === 'com'){
+										console.log("Adding comment (test):" + comment);
+									}
+								}
+							})
+							.catch(collected => {
+								console.log("First time comment collected: " + collected);
+							});
+						})
+					})
 				}else{
+					//TODO: Consider not having a return message here, or something more generic
 					message.channel.send("Invalid team.");
 				}
       })
       .catch(collected => {
-          message.channel.send('Timeout');
+      	console.log("First time add team collected:" + collected);
+        //message.channel.send('Timeout');
       });
   })
 }
+
+
+// Display the results of the selected teams that beat the given team
+function displayAttackResults(off_team, vers){
+	for(let i = 0; i < off_team.num; i++){
+		message.channel.send(off_team.teamStr(i));
+	}
+}
+
+
 
 // Layered functions:
 // First is nicknames to generate array of ids
@@ -83,15 +148,14 @@ function submitFirstTeam(r_client, message, nick, d_team, version){
 // Add support to view all
 // Add support to view only unpopular results
 function battle(r_client, message, args){
-	let tot_cnt = 10;
 	r_client.hgetall('char_nick', async function(err, nick) {
 		const { promisify } = require('util');
 		const getAsync = promisify(r_client.get).bind(r_client);
 	
-		let ver = [];
-		ver[0] = await getAsync('cur_version');
-		ver[1] = await getAsync('prev_version');
-		ver[2] = await getAsync('dead_version');
+		let vers = [];
+		vers[0] = await getAsync('cur_version');
+		vers[1] = await getAsync('prev_version');
+		vers[2] = await getAsync('dead_version');
 	
 		let id_arr = createIDArray(args, nick);
 		
@@ -102,30 +166,26 @@ function battle(r_client, message, args){
 		hgetall(`char_data_${id_arr[3]}`).
 		hgetall(`char_data_${id_arr[4]}`).
 		exec(function(err,results){
-			let team = new units.Team(results, results.length - 1);
-		
-			r_client.hgetall(team.units_str(), function(err, results){
-				if(results === null){ // No teams exist!
-					submitFirstTeam(r_client, message, nick, team, ver[0]);
+			let def_team = new Units.Team(results, results.length - 1);
+			let team_str = def_team.units_str();
+			
+			r_client.zrevrangebyscore(team_str, 1000, 0, "withscores", async function(err, results){
+				if(results === null || results.length === 0){ // No teams exist!
+					submitFirstTeam(r_client, message, nick, def_team, vers[0]);
 				}else{ // Teams exist!
-					let cur_ver = new Off_Teams(ver);
+					let tot_cnt = results.length;					
+					let off_teams = new Units.Off_Teams(def_team);
+					let top_cnt = 2;
 					
-					for(const r in results){ // All the submitted teams
-						const c = r.charAt(0);
-						if(c >= '0' && c <= '9'){ // y_n data
-							continue;
-						}else{ // Version data
-							let versions = results[r].split("_");
-							if(versions[0] === version){ // Current version
-								let y_n = results[versions[0]+"_"+r]
-								cur_ver.addTeam(r,y_n);
-							}else{ // Old version, //TODO: Deal with when new version arrives
-							
-							}
-						}
+					for(let i = 0; i < tot_cnt && i < 2*top_cnt; i+2){
+						off_teams.add_team(results[i], results[i+1], await getAsync(team_str+"-"+results[i]));
 					}
-					let str = cur_ver.filt_str('y');
-					message.channel.send(str);
+					
+					if(tot_cnt > 2*top_cnt){
+						let rand = Math.floor(((tot_cnt - 2*top_cnt)/2)*Math.random() + 2*top_cnt);
+						off_teams.add_team(results[rand], results[rand+1], await getAsync(team_str+"-"+results[rand]));
+					}
+					displayAttackResults(off_teams, vers);
 				}
 			});
 		/*

@@ -16,6 +16,7 @@ function updateVer(r_client, version){
 				console.log(`Prev version set: ${reply}`);
 			});
 		}else{
+			//TODO: Add dead version cleanup here (results[2]) if it's not null
 			r_client.set('cur_version', version, function(err, reply){
 				console.log(`Current version set: ${reply}`);
 			});
@@ -25,8 +26,6 @@ function updateVer(r_client, version){
 			r_client.set('dead_version', results[1], function(err, reply){
 				console.log(`Dead version set: ${reply}`);
 			});
-			
-			//TODO: Add dead version cleanup on results[2] if it's not null
 		}
 	});
 }
