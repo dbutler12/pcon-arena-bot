@@ -12,12 +12,12 @@ function createIDArray(chars, nick){
 	for(let i = 0; i < chars.length; i++){
 		let char_str = chars[i].charAt(0).toUpperCase() + chars[i].substr(1).toLowerCase();
 		if(!(char_str in nick)){
-			err = `Char ${char_str} unknown.`;
+			error = `Char ${char_str} unknown.`;
 			return {error, id_arr};
 		}
 		let id = nick[char_str];
 		if(id_dup[id]){
-			err = `Invalid team: can't have duplicate character ${char_str}.`;
+			error = `Invalid team: can't have duplicate character ${char_str}.`;
 			return {error, id_arr};
 		}
 		id_dup[id] = true;
@@ -43,13 +43,15 @@ function submitFirstTeam(r_client, message, nick, def_team, version){
       })
       .then(message => {
       	const PREFIX = "!";
+      	let raw_team = "";
       	message = message.first();
       	if(message.content.startsWith(PREFIX)){
 		  		const raw_message = message.content
 		  		.trim()
 		  		.substring(PREFIX.length)
 		  		
-		  		let [command, ...raw_team] = raw_message.split(/\s+/);
+		  		let [command, ...raw] = raw_message.split(/\s+/);
+		  		raw_team = raw;
 		  		if(command !== 'add'){
 		  			return;
 		  		}
@@ -59,7 +61,7 @@ function submitFirstTeam(r_client, message, nick, def_team, version){
 				
 				if(raw_team.length === 5) {
 					let {error, id_arr} = createIDArray(raw_team, nick);
-					if(err){
+					if(error){
 						return message.channel.send(err);
 					}
 					r_client.multi().
@@ -191,12 +193,12 @@ function battle(r_client, message, args){
 					let top_cnt = 2;
 					
 					for(let i = 0; i < tot_cnt && i < 2*top_cnt; i+2){
-						off_teams.add_team(results[i], results[i+1], await getAsync(team_str+"-"+results[i]));
+						off_teams.addTeam(results[i], results[i+1], await getAsync(team_str+"-"+results[i]));
 					}
 					
 					if(tot_cnt > 2*top_cnt){
 						let rand = Math.floor(((tot_cnt - 2*top_cnt)/2)*Math.random() + 2*top_cnt);
-						off_teams.add_team(results[rand], results[rand+1], await getAsync(team_str+"-"+results[rand]));
+						off_teams.addTeam(results[rand], results[rand+1], await getAsync(team_str+"-"+results[rand]));
 					}
 					displayAttackResults(off_teams, vers);
 				}
