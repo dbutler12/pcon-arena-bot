@@ -81,9 +81,9 @@ function Off_Teams(a_team){
 	// this["Jun_Miyako_Kuka_Ilya_Hiyori"] = 512
 	
 	this.teamStr = function(num){
-		let data = this[this[num]];
+		let data = this[num];
 		let team = data.team.split("_");
-		return ":" + team.join("::") + ":  " + "Score:" data.score + " V" + data.version;
+		return ":" + team.join("::") + ":  " + "Score:" + data.score + " V" + data.version;
 	}
 	
 	this.filtStr = function(){

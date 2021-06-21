@@ -7,20 +7,23 @@ function addComment(r_client, message, version, def_team, off_team, user){
 
 function createIDArray(chars, nick){
 	let id_arr = [];
+	let err = null;
 	let id_dup = {}; // Duplicate character checker, to avoid calling redis if invalid team
 	for(let i = 0; i < chars.length; i++){
 		let char_str = chars[i].charAt(0).toUpperCase() + chars[i].substr(1).toLowerCase();
 		if(!(char_str in nick)){
-			return message.channel.send(`Char ${char_str} unknown.`);
+			err = `Char ${char_str} unknown.`;
+			return {err, id_arr};
 		}
 		let id = nick[char_str];
 		if(id_dup[id]){
-			return message.channel.send(`Invalid team: can't have duplicate character ${char_str}.`);
+			err = `Invalid team: can't have duplicate character ${char_str}.`;
+			return {err, id_arr};
 		}
 		id_dup[id] = true;
 		id_arr.push(id);
 	}
-	return id_arr;
+	return {err, id_arr};
 }
 
 
@@ -49,8 +52,10 @@ function submitFirstTeam(r_client, message, nick, def_team, version){
 				}
 				
 				if(raw_team.length === 5) {
-					let id_arr = createIDArray(raw_team, nick);
-
+					let {err, id_arr} = createIDArray(raw_team, nick);
+					if(err){
+						return message.channel.send(err);
+					}
 					r_client.multi().
 					hgetall(`char_data_${id_arr[0]}`).
 					hgetall(`char_data_${id_arr[1]}`).
@@ -157,8 +162,10 @@ function battle(r_client, message, args){
 		vers[1] = await getAsync('prev_version');
 		vers[2] = await getAsync('dead_version');
 	
-		let id_arr = createIDArray(args, nick);
-		
+		let {err, id_arr} = createIDArray(args, nick);
+		if(err){
+			return message.channel.send(err);
+		}
 		r_client.multi().
 		hgetall(`char_data_${id_arr[0]}`).
 		hgetall(`char_data_${id_arr[1]}`).
