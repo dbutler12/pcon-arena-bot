@@ -7,23 +7,23 @@ function addComment(r_client, message, version, def_team, off_team, user){
 
 function createIDArray(chars, nick){
 	let id_arr = [];
-	let err = null;
+	let error = null;
 	let id_dup = {}; // Duplicate character checker, to avoid calling redis if invalid team
 	for(let i = 0; i < chars.length; i++){
 		let char_str = chars[i].charAt(0).toUpperCase() + chars[i].substr(1).toLowerCase();
 		if(!(char_str in nick)){
 			err = `Char ${char_str} unknown.`;
-			return {err, id_arr};
+			return {error, id_arr};
 		}
 		let id = nick[char_str];
 		if(id_dup[id]){
 			err = `Invalid team: can't have duplicate character ${char_str}.`;
-			return {err, id_arr};
+			return {error, id_arr};
 		}
 		id_dup[id] = true;
 		id_arr.push(id);
 	}
-	return {err, id_arr};
+	return {error, id_arr};
 }
 
 
@@ -45,14 +45,20 @@ function submitFirstTeam(r_client, message, nick, def_team, version){
       	const PREFIX = "!";
       	message = message.first();
       	if(message.content.startsWith(PREFIX)){
-		  		const raw_team = message.content
+		  		const raw_message = message.content
 		  		.trim()
 		  		.substring(PREFIX.length)
-		  		.split(/\s+/);
-				}
+		  		
+		  		let [command, ...raw_team] = raw_message.split(/\s+/);
+		  		if(command !== 'add'){
+		  			return;
+		  		}
+				}else{
+					return;
+				}		
 				
 				if(raw_team.length === 5) {
-					let {err, id_arr} = createIDArray(raw_team, nick);
+					let {error, id_arr} = createIDArray(raw_team, nick);
 					if(err){
 						return message.channel.send(err);
 					}
@@ -162,8 +168,8 @@ function battle(r_client, message, args){
 		vers[1] = await getAsync('prev_version');
 		vers[2] = await getAsync('dead_version');
 	
-		let {err, id_arr} = createIDArray(args, nick);
-		if(err){
+		let {error, id_arr} = createIDArray(args, nick);
+		if(error){
 			return message.channel.send(err);
 		}
 		r_client.multi().
