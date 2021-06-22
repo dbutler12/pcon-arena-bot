@@ -72,12 +72,12 @@ function submitFirstTeam(r_client, message, nick, def_team, version){
 					hgetall(`char_data_${id_arr[4]}`).
 					exec(function(err,results){
 						let off_team = new Units.Team(results, results.length);
-						let version_entry = version + "-" + off_team.units_str();
+						let version_entry = version + "-" + off_team.unitsStr();
 						
 						//TODO: Remake data structures
 						//Add to sorted set chars_defense_team: chars_offense_team
-						let off_str = off_team.units_str();
-						let def_str = def_team.units_str();
+						let off_str = off_team.unitsStr();
+						let def_str = def_team.unitsStr();
 						let score_str = createScoreStr(def_str, off_str, version);
 						
 						r_client.zadd(def_str, 100, off_str); // Team added to sorted set
@@ -184,8 +184,8 @@ function battle(r_client, message, args){
 			if(err){
 				return console.log("Error in battle raw defense team:" + err);
 			}
-			let def_team = new Units.Team(results, results.length - 1);
-			let team_str = def_team.units_str();
+			let def_team = new Units.Team(results, results.length);
+			let team_str = def_team.unitsStr();
 			
 			r_client.zrevrangebyscore(team_str, 1000, 0, "withscores", async function(err, results){
 				if(err){

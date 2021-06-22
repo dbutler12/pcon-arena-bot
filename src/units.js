@@ -53,7 +53,7 @@ function Team(data, num, team2 = null, team3 = null){
 		}
 	}
 	
-	this.units_str = function(){
+	this.unitsStr = function(){
 		return this.units.map(u => u.name).join('_');
 	}
 	
