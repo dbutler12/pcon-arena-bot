@@ -28,15 +28,29 @@ function createIDArray(chars, nick){
 
 
 function RedisDefOffStr(def_team, off_team, version){
-	this.off_str = off_team.unitsStr();
-	this.def_str = def_team.unitsStr();
 	this.version = version;
+	
+	this.init = function(){
+		if(typeof off_team === 'string' || off_team instanceof String){
+			off_str = off_team;
+		}else{
+			this.off_str = off_team.unitsStr();
+		}
+		
+		if(typeof def_team === 'string' || def_team instanceof String){
+			def_str = def_team;
+		}else{
+			this.def_str = def_team.unitsStr();
+		}
+	}
 	
 	this.toStr = function(prefix = "", suffix = ""){
 		if(prefix !== "") prefix = prefix + "-";
 		if(suffix !== "") suffix = "-" + suffix;
 		return prefix + this.version + "-" + this.def_str + "-" + this.off_str + suffix; 
 	}
+	
+	this.init();
 }
 
 
@@ -219,7 +233,7 @@ function battle(r_client, message, args){
 					
 					for(let i = 0; i < tot_cnt && i < 2*top_cnt; i+=2){
 						let version = await getAsync(team_str+"-"+results[i]);
-						let redis_str = new RedisDefOffStr(team_str, results[i],version)
+						let redis_str = new RedisDefOffStr(team_str, results[i], version)
 						let tag = await setsAsync(redis_str.toStr("", "tags"));
 						let comment = await getAsync(redis_str.toStr(tag[0],"comment"));
 						off_teams.addTeam(results[i], results[i+1], version, comment);
