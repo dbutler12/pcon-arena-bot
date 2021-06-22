@@ -27,7 +27,7 @@ function createIDArray(chars, nick){
 }
 
 
-function redisDefOffStr(def_team, off_team, version){
+function RedisDefOffStr(def_team, off_team, version){
 	this.off_str = off_team.unitsStr();
 	this.def_str = def_team.unitsStr();
 	this.version = version;
@@ -86,7 +86,7 @@ function submitFirstTeam(r_client, message, nick, def_team, version){
 						let off_str = off_team.unitsStr();
 						let def_str = def_team.unitsStr();
 						
-						let redis_str = redisDefOffStr(def_team, off_team, version);
+						let redis_str = new RedisDefOffStr(def_team, off_team, version);
 						let score_str = redis_str.toStr("", "score");
 						
 						r_client.zadd(def_str, 100, off_str); // Team added to sorted set
@@ -219,9 +219,9 @@ function battle(r_client, message, args){
 					
 					for(let i = 0; i < tot_cnt && i < 2*top_cnt; i+=2){
 						let version = await getAsync(team_str+"-"+results[i]);
-						let redisStr = redisDefOffStr(team_str, results[i],version)
-						let tag = await setsAsync(redisStr.toStr("", "tags"));
-						let comment = await getAsync(redisStr.toStr(tag[0],"comment"));
+						let redis_str = new RedisDefOffStr(team_str, results[i],version)
+						let tag = await setsAsync(redis_str.toStr("", "tags"));
+						let comment = await getAsync(redis_str.toStr(tag[0],"comment"));
 						off_teams.addTeam(results[i], results[i+1], version, comment);
 					}
 					
