@@ -27,9 +27,16 @@ function createIDArray(chars, nick){
 }
 
 
-
-function createScoreStr(def_str, off_str, version){
-	return version + "-" + def_str + "-" + off_str + "-score";
+function redisDefOffStr(def_team, off_team, version){
+	this.off_str = off_team.unitsStr();
+	this.def_str = def_team.unitsStr();
+	this.version = version;
+	
+	this.toStr = function(prefix = "", suffix = ""){
+		if(prefix !== "") prefix = prefix + "-";
+		if(suffix !== "") suffix = "-" + suffix;
+		return prefix + version + "-" + def_str + "-" + off_str + suffix; 
+	}
 }
 
 
@@ -78,7 +85,9 @@ function submitFirstTeam(r_client, message, nick, def_team, version){
 						//Add to sorted set chars_defense_team: chars_offense_team
 						let off_str = off_team.unitsStr();
 						let def_str = def_team.unitsStr();
-						let score_str = createScoreStr(def_str, off_str, version);
+						
+						let redis_str = redisDefOffStr(def_team, off_team, version);
+						let score_str = redis_str.toStr("", "score");
 						
 						r_client.zadd(def_str, 100, off_str); // Team added to sorted set
 						
@@ -120,10 +129,19 @@ function submitFirstTeam(r_client, message, nick, def_team, version){
 									.substring(PREFIX.length);
 									
 									let [command, ...comment] = raw_comment.split(/\s+/);
-									comment = comment.join(/\s+/);
+									comment = comment.join(" ");
 									
 									if(command === 'com'){
-										console.log("Adding comment (test):" + comment);
+										let usr_tag = message.author.tag;
+										let tag_str = redis_str.toStr("", "tags");
+										r_client.zadd(tag_str, 100, usr_tag); // Add user tag to comments
+										
+										let com_str = redis_str.toStr(usr_tag, "comment");
+										r_client.set(com_str, comment, function(err, reply){
+											if(!err){
+												message.channel.send("Comment set for this team.");
+											}
+										});
 									}
 								}
 							})
@@ -194,13 +212,17 @@ function battle(r_client, message, args){
 				if(results === null || results.length === 0){ // No teams exist!
 					submitFirstTeam(r_client, message, nick, def_team, vers[0]);
 				}else{ // Teams exist!
+					const setsAsync = promisify(r_client.zrevrangebyscore).bind(r_client);
 					let tot_cnt = results.length;					
 					let off_teams = new Units.Off_Teams(def_team);
 					let top_cnt = 2;
 					
 					for(let i = 0; i < tot_cnt && i < 2*top_cnt; i+=2){
 						let version = await getAsync(team_str+"-"+results[i]);
-						off_teams.addTeam(results[i], results[i+1], version);
+						let redisStr = redisDefOffStr(team_str, results[i],version)
+						let tag = await setsAsync(redisStr.toStr("", "tags"));
+						let comment = await getAsync(redisStr.toStr(tag[0],"comment"));
+						off_teams.addTeam(results[i], results[i+1], version, comment);
 					}
 					
 					if(tot_cnt > 2*top_cnt){

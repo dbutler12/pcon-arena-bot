@@ -67,13 +67,30 @@ function Off_Teams(a_team){
 	this.against = a_team; // This is the team that the offense is built against
 	this.num = 0;
 	
-	this.addTeam = function(team, score, version){
-		this[this.num] = {team: team, score: score, version: version};
+	this.addTeam = function(team, score, version, comment = ""){
+		if(comment === null) comment = "";
+		this[this.num] = {team: team, score: score, version: version, comment: comment};
 		this.num++;
 	}
 	
-	this.getVal = function(num){
-		return this[this[num]];
+	this.getDefStr = function(){
+		return this.against.unitsStr();
+	}
+	
+	this.getTeam = function(num){
+		return this[num].team.unitsStr();
+	}
+	
+	this.getScore = function(num){
+		return this[num].score;
+	}
+	
+	this.getVersion = function(num){
+		return this[num].version;
+	}
+	
+	this.getComment = function(num){
+		return this[num].comment;
 	}
 	
 	// example properties
@@ -83,7 +100,12 @@ function Off_Teams(a_team){
 	this.teamStr = function(num){
 		let data = this[num];
 		let team = data.team.split("_");
-		return ":" + team.join("::") + ":  " + "Score:" + data.score + " V" + data.version;
+		let main = ":" + team.join("::") + ":  " + "Score:" + data.score + " V" + data.version;
+		let comm = data.comment;
+		if(comm !== ""){
+			main = main + "\n" + comm;
+		}
+		return main;
 	}
 	
 	this.filtStr = function(){
