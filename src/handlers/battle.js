@@ -62,7 +62,7 @@ function submitFirstTeam(r_client, message, nick, def_team, version){
 				if(raw_team.length === 5) {
 					let {error, id_arr} = createIDArray(raw_team, nick);
 					if(error){
-						return message.channel.send(err);
+						return message.channel.send(error);
 					}
 					r_client.multi().
 					hgetall(`char_data_${id_arr[0]}`).
@@ -172,7 +172,7 @@ function battle(r_client, message, args){
 	
 		let {error, id_arr} = createIDArray(args, nick);
 		if(error){
-			return message.channel.send(err);
+			return message.channel.send(error);
 		}
 		r_client.multi().
 		hgetall(`char_data_${id_arr[0]}`).
@@ -181,10 +181,16 @@ function battle(r_client, message, args){
 		hgetall(`char_data_${id_arr[3]}`).
 		hgetall(`char_data_${id_arr[4]}`).
 		exec(function(err,results){
+			if(err){
+				return console.log("Error in battle raw defense team:" + err);
+			}
 			let def_team = new Units.Team(results, results.length - 1);
 			let team_str = def_team.units_str();
 			
 			r_client.zrevrangebyscore(team_str, 1000, 0, "withscores", async function(err, results){
+				if(err){
+					return console.log("Error in battle defense team scores:" + err);
+				}
 				if(results === null || results.length === 0){ // No teams exist!
 					submitFirstTeam(r_client, message, nick, def_team, vers[0]);
 				}else{ // Teams exist!
