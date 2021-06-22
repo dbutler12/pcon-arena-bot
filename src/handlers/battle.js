@@ -83,8 +83,8 @@ function submitFirstTeam(r_client, message, nick, def_team, version){
 						r_client.zadd(def_str, 100, off_str); // Team added to sorted set
 						
 						// Add version data for team to string
-						r_client.set(off_str + "-" + def_str, version, function(err, reply){
-							console.log(`New team set: ${off_str}-${def_str}:${reply}`);
+						r_client.set(def_str + "-" + off_str, version, function(err, reply){
+							console.log(`New team set: ${def_str}-${off_str}:${reply}`);
 						});
 						
 						// Add to version-defense-offense-score: [y or n]-user_tag
@@ -146,7 +146,7 @@ function submitFirstTeam(r_client, message, nick, def_team, version){
 
 
 // Display the results of the selected teams that beat the given team
-function displayAttackResults(off_team, vers){
+function displayAttackResults(message, off_team, vers){
 	for(let i = 0; i < off_team.num; i++){
 		message.channel.send(off_team.teamStr(i));
 	}
@@ -198,15 +198,16 @@ function battle(r_client, message, args){
 					let off_teams = new Units.Off_Teams(def_team);
 					let top_cnt = 2;
 					
-					for(let i = 0; i < tot_cnt && i < 2*top_cnt; i+2){
-						off_teams.addTeam(results[i], results[i+1], await getAsync(team_str+"-"+results[i]));
+					for(let i = 0; i < tot_cnt && i < 2*top_cnt; i+=2){
+						let version = await getAsync(team_str+"-"+results[i]);
+						off_teams.addTeam(results[i], results[i+1], version);
 					}
 					
 					if(tot_cnt > 2*top_cnt){
 						let rand = Math.floor(((tot_cnt - 2*top_cnt)/2)*Math.random() + 2*top_cnt);
 						off_teams.addTeam(results[rand], results[rand+1], await getAsync(team_str+"-"+results[rand]));
 					}
-					displayAttackResults(off_teams, vers);
+					displayAttackResults(message, off_teams, vers);
 				}
 			});
 		/*
