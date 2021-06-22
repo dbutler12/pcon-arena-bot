@@ -35,7 +35,7 @@ function RedisDefOffStr(def_team, off_team, version){
 	this.toStr = function(prefix = "", suffix = ""){
 		if(prefix !== "") prefix = prefix + "-";
 		if(suffix !== "") suffix = "-" + suffix;
-		return prefix + version + "-" + def_str + "-" + off_str + suffix; 
+		return prefix + this.version + "-" + this.def_str + "-" + this.off_str + suffix; 
 	}
 }
 
