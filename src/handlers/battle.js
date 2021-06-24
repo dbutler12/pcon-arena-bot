@@ -186,7 +186,7 @@ function redisAddTeam(r_client, message, def_team, off_team, version){
 }
 
 
-async function submitFirstTeam(r_client, message, def_team, version){
+function submitFirstTeam(r_client, message, def_team, version){
 	let user = m => m.author.id === message.author.id;
   message.channel.send(`No teams exist to defeat that team. If you want to add a team: Submit 5 units to add a new team.\nExample: !add Io Shinobu Suzume Ilya Aoi.`).then(() => {
     message.channel.awaitMessages(user, {
@@ -194,7 +194,7 @@ async function submitFirstTeam(r_client, message, def_team, version){
         time: 25000,
         errors: ['time']
       })
-      .then(message => {
+      .then(async function(message){
       	const PREFIX = "!";
       	let raw_team = "";
       	message = message.first();
@@ -214,7 +214,6 @@ async function submitFirstTeam(r_client, message, def_team, version){
 				
 				if(raw_team.length === 5) {
 					let off_team = await redisPullTeam(r_client, message, raw_team);
-					console.log(off_team);
 					redisAddTeam(r_client, message, def_team, off_team, version)
 					
 					message.channel.send("Team added!");
@@ -239,20 +238,22 @@ async function submitFirstTeam(r_client, message, def_team, version){
 								
 								if(command === 'com'){
 									let usr_tag = message.author.tag;
+									let redis_str = new RedisDefOffStr(def_team, off_team, version)
 									let tag_str = redis_str.toStr("", "tags");
 									r_client.zadd(tag_str, 100, usr_tag); // Add user tag to comments
 									
 									let com_str = redis_str.toStr(usr_tag, "comment");
 									r_client.set(com_str, comment, function(err, reply){
 										if(!err){
-											message.channel.send("Comment set for this team.");
+											message.channel.send("Comment set.");
 										}
 									});
 								}
 							}
 						})
 						.catch(collected => {
-							console.log("First time comment collected: " + collected);
+							console.log("First time comment collected:");
+							console.log(collected);
 						});
 					})
 				}else{
