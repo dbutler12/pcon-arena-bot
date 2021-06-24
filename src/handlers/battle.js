@@ -214,6 +214,7 @@ async function submitFirstTeam(r_client, message, def_team, version){
 				
 				if(raw_team.length === 5) {
 					let off_team = await redisPullTeam(r_client, message, raw_team);
+					console.log(off_team);
 					redisAddTeam(r_client, message, def_team, off_team, version)
 					
 					message.channel.send("Team added!");
@@ -260,8 +261,8 @@ async function submitFirstTeam(r_client, message, def_team, version){
 				}
       })
       .catch(collected => {
-      	console.log("First time add team collected:" + collected);
-        //message.channel.send('Timeout');
+      	console.log("First time add team collected:");
+        console.log(collected);
       });
   })
 }
