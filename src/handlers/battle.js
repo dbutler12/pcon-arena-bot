@@ -25,15 +25,13 @@ function createIDArray(chars, nick){
 	return {error, id_arr};
 }
 
-async function redisPullTeam(r_client, chars){
+async function redisPullTeam(r_client, message, chars){
 		const { promisify } = require('util');
 		const hashAsync = promisify(r_client.hgetall).bind(r_client);
 		
 		let nick = await hashAsync('char_nick');
-		let {error, id_arr} = createIDArray(args, nick);
-		if(error){
-			return message.channel.send(error);
-		}
+		let {error, id_arr} = createIDArray(chars, nick);
+		if(error) return message.channel.send(error);
 		
 		let results = [];
 		for(let i = 0; i < id_arr.length; i++){
@@ -188,7 +186,7 @@ function redisAddTeam(r_client, message, def_team, off_team, version){
 }
 
 
-function submitFirstTeam(r_client, message, def_team, version){
+async function submitFirstTeam(r_client, message, def_team, version){
 	let user = m => m.author.id === message.author.id;
   message.channel.send(`No teams exist to defeat that team. If you want to add a team: Submit 5 units to add a new team.\nExample: !add Io Shinobu Suzume Ilya Aoi.`).then(() => {
     message.channel.awaitMessages(user, {
@@ -215,7 +213,7 @@ function submitFirstTeam(r_client, message, def_team, version){
 				}		
 				
 				if(raw_team.length === 5) {
-					let off_team = redisPullTeam(r_client, raw_team);
+					let off_team = await redisPullTeam(r_client, message, raw_team);
 					redisAddTeam(r_client, message, def_team, off_team, version)
 					
 					message.channel.send("Team added!");
@@ -277,19 +275,18 @@ function displayAttackResults(message, off_team){
 }
 
 
-
 // Layered functions:
 // First is nicknames to generate array of ids
 // Second is 
 // Add support to get a count for results
 // Add support to view all
 // Add support to view only unpopular results
-function battle(r_client, message, args){
+async function battle(r_client, message, args){
 	const { promisify } = require('util');
 	const getAsync = promisify(r_client.get).bind(r_client);
 
 	let version = await getAsync('cur_version');
-	let def_team = redisPullTeam(r_client, args);
+	let def_team = await redisPullTeam(r_client, message, args);
 	let team_str = def_team.unitsStr();
 
 		
@@ -310,11 +307,11 @@ function battle(r_client, message, args){
 			let top_cnt = 2;
 			
 			for(let i = 0; i < tot_cnt && i < 2*top_cnt; i+=2){
-				let version = await getAsync(team_str+"-"+results[i]);
-				let redis_str = new RedisDefOffStr(team_str, results[i], version)
+				let team_version = await getAsync(team_str+"-"+results[i]);
+				let redis_str = new RedisDefOffStr(team_str, results[i], team_version)
 				let tag = await setsAsync(redis_str.toStr("", "tags"), 1000, 0);
 				let comment = await getAsync(redis_str.toStr(tag[0],"comment"));
-				off_teams.addTeam(results[i], results[i+1], version, comment);
+				off_teams.addTeam(results[i], results[i+1], team_version, comment);
 			}
 			
 			if(tot_cnt > 2*top_cnt){
