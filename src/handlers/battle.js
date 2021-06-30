@@ -325,9 +325,8 @@ async function battle(r_client, message, args){
 				let rand = Math.floor(((tot_cnt - 2*top_cnt)/2)*Math.random() + 2*top_cnt);
 				off_teams.addTeam(results[rand], results[rand+1], await getAsync(team_str+"-"+results[rand]));
 			}
-			displayAttackResults(message, off_teams).then(() => {
-				submitTeam(r_client, message, def_team, version);
-			});
+			displayAttackResults(message, off_teams);
+			submitTeam(r_client, message, def_team, version);
 		}
 	});
 }
