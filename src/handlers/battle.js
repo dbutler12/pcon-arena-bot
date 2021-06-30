@@ -1,6 +1,6 @@
 const Units  = require('../units');
 
-function addComment(r_client, message, version, def_team, off_team){
+function addComment(r_client, message, version, user, def_team, off_team){
 	message.channel.awaitMessages(user, {
 			max: 1,
 			time: 25000,
@@ -115,7 +115,7 @@ function redisUpdateTeamVersion(r_client, score_str, def_str, off_str, team_vers
 	});
 	
 	// Delete all user data for previous scoring
-	r_client.del(prev_version + "-" + def_str + "-" + off_str + "-score");
+	r_client.del(team_vers + "-" + def_str + "-" + off_str + "-score");
 	
 	// Add user data to current scoring
 	r_client.sadd([score_str, "y-" + message.author.tag], function(err, reply) {
@@ -225,7 +225,7 @@ function redisAddTeam(r_client, message, def_team, off_team, version){
 }
 
 
-function submitTeam(r_client, message, def_team, version, comment = ""){
+function submitTeam(r_client, message, version, def_team, comment = ""){
 	let user = m => m.author.id === message.author.id;
   message.channel.send(`${comment}If you want to add a team: Submit 5 units to add a new team.\nExample: !add Io Shinobu Suzume Ilya Aoi.`).then(() => {
     message.channel.awaitMessages(user, {
@@ -259,7 +259,7 @@ function submitTeam(r_client, message, def_team, version, comment = ""){
 					
 					// TODO: Modularize this, so comments can just be added at any point
 					message.channel.send(`If you would like to add a comment to this team, use !com Comment\nExample: !com Team only works with 4*+ Io.`).then(() => {
-						addComment(r_client, message, version, def_team, off_team);
+						addComment(r_client, message, version, user, def_team, off_team);
 					})
 				}else{
 					//TODO: Consider not having a return message here, or something more generic
@@ -306,7 +306,7 @@ async function battle(r_client, message, args){
 			return console.log("Error in battle defense team scores:" + err);
 		}
 		if(results === null || results.length === 0){ // No teams exist!
-			submitTeam(r_client, message, def_team, version, "No teams exist to defeat that team. ");
+			submitTeam(r_client, message, version, def_team, "No teams exist to defeat that team. ");
 		}else{ // Teams exist!
 			const setsAsync = promisify(r_client.zrevrangebyscore).bind(r_client);
 			let tot_cnt = results.length;					
@@ -326,7 +326,7 @@ async function battle(r_client, message, args){
 				off_teams.addTeam(results[rand], results[rand+1], await getAsync(team_str+"-"+results[rand]));
 			}
 			displayAttackResults(message, off_teams);
-			submitTeam(r_client, message, def_team, version);
+			submitTeam(r_client, message, version, def_team);
 		}
 	});
 }
