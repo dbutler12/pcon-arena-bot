@@ -157,7 +157,7 @@ function redisUpdateTeamVersion(r_client, message, score_str, def_str, off_str, 
 }
 
 
-function redisAddTeam(r_client, message, def_team, off_team, version){
+async function redisAddTeam(r_client, message, def_team, off_team, version){
 	//Add to sorted set chars_defense_team: chars_offense_team
 	let off_str = off_team.unitsStr();
 	let def_str = def_team.unitsStr();
@@ -206,7 +206,7 @@ function redisAddTeam(r_client, message, def_team, off_team, version){
 			const getAsync = promisify(r_client.get).bind(r_client);
 			const setMemAsync = promisify(r_client.sismember).bind(r_client);
 			
-			let team_vers = getAsync(def_str + "-" + off_str);
+			let team_vers = await getAsync(def_str + "-" + off_str);
 			if(team_vers === version){ // Same version as known team
 				let yes = setMemAsync(version + "-" + def_str + "-" + off_str + "-score", "y-" + message.author.tag);
 				if(yes){
