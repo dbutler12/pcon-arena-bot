@@ -1,7 +1,41 @@
 const Units  = require('../units');
 
-function addComment(r_client, message, version, def_team, off_team, user){
-
+function addComment(r_client, message, version, def_team, off_team){
+	message.channel.awaitMessages(user, {
+			max: 1,
+			time: 25000,
+			errors: ['time']
+		})
+		.then(message => {
+			const PREFIX = "!";
+			message = message.first();
+			if(message.content.startsWith(PREFIX)){
+				const raw_comment = message.content
+				.trim()
+				.substring(PREFIX.length);
+				
+				let [command, ...comment] = raw_comment.split(/\s+/);
+				comment = comment.join(" ");
+				
+				if(command === 'com'){
+					let usr_tag = message.author.tag;
+					let redis_str = new RedisDefOffStr(def_team, off_team, version)
+					let tag_str = redis_str.toStr("", "tags");
+					r_client.zadd(tag_str, 100, usr_tag); // Add user tag to comments
+					
+					let com_str = redis_str.toStr(usr_tag, "comment");
+					r_client.set(com_str, comment, function(err, reply){
+						if(!err){
+							message.channel.send("Comment set.");
+						}
+					});
+				}
+			}
+		})
+		.catch(collected => {
+			console.log("Comment collected:");
+			console.log(collected);
+		});
 }
 
 function createIDArray(chars, nick){
@@ -25,6 +59,8 @@ function createIDArray(chars, nick){
 	return {error, id_arr};
 }
 
+// Returns a Team object comprised of the characters given in the 'chars' array
+// chars is an array of strings
 async function redisPullTeam(r_client, message, chars){
 		const { promisify } = require('util');
 		const hashAsync = promisify(r_client.hgetall).bind(r_client);
@@ -41,7 +77,10 @@ async function redisPullTeam(r_client, message, chars){
 		return new Units.Team(results, results.length);
 }
 
-
+// Object to convert def/off teams into Redis datastructure strings
+// Instantiate with a def team, off team, and version
+// def/off teams can be strings or a Team object
+// Use the toStr method with desired prefix/suffix for desired data
 function RedisDefOffStr(def_team, off_team, version){
 	this.version = version;
 	
@@ -68,7 +107,7 @@ function RedisDefOffStr(def_team, off_team, version){
 	this.init();
 }
 
-
+// When a team is from an older version, this function updates its version
 function redisUpdateTeamVersion(r_client, score_str, def_str, off_str, team_vers, version, score, tag){
 	// Update version	
 	r_client.set(def_str + "-" + off_str, version, function(err, reply){
@@ -186,9 +225,9 @@ function redisAddTeam(r_client, message, def_team, off_team, version){
 }
 
 
-function submitFirstTeam(r_client, message, def_team, version){
+function submitTeam(r_client, message, def_team, version, comment = ""){
 	let user = m => m.author.id === message.author.id;
-  message.channel.send(`No teams exist to defeat that team. If you want to add a team: Submit 5 units to add a new team.\nExample: !add Io Shinobu Suzume Ilya Aoi.`).then(() => {
+  message.channel.send(`${comment}If you want to add a team: Submit 5 units to add a new team.\nExample: !add Io Shinobu Suzume Ilya Aoi.`).then(() => {
     message.channel.awaitMessages(user, {
         max: 1,
         time: 25000,
@@ -220,41 +259,7 @@ function submitFirstTeam(r_client, message, def_team, version){
 					
 					// TODO: Modularize this, so comments can just be added at any point
 					message.channel.send(`If you would like to add a comment to this team, use !com Comment\nExample: !com Team only works with 4*+ Io.`).then(() => {
-					message.channel.awaitMessages(user, {
-							max: 1,
-							time: 25000,
-							errors: ['time']
-						})
-						.then(message => {
-							const PREFIX = "!";
-							message = message.first();
-							if(message.content.startsWith(PREFIX)){
-								const raw_comment = message.content
-								.trim()
-								.substring(PREFIX.length);
-								
-								let [command, ...comment] = raw_comment.split(/\s+/);
-								comment = comment.join(" ");
-								
-								if(command === 'com'){
-									let usr_tag = message.author.tag;
-									let redis_str = new RedisDefOffStr(def_team, off_team, version)
-									let tag_str = redis_str.toStr("", "tags");
-									r_client.zadd(tag_str, 100, usr_tag); // Add user tag to comments
-									
-									let com_str = redis_str.toStr(usr_tag, "comment");
-									r_client.set(com_str, comment, function(err, reply){
-										if(!err){
-											message.channel.send("Comment set.");
-										}
-									});
-								}
-							}
-						})
-						.catch(collected => {
-							console.log("First time comment collected:");
-							console.log(collected);
-						});
+						addComment(r_client, message, version, def_team, off_team);
 					})
 				}else{
 					//TODO: Consider not having a return message here, or something more generic
@@ -291,7 +296,7 @@ async function battle(r_client, message, args){
 	let def_team = await redisPullTeam(r_client, message, args);
 	let team_str = def_team.unitsStr();
 
-		
+		// Examples:
 		//Fengtorin#5328-2.5.0-Aoi_Suzume_Io_Illya_Shinobu-Aoi_Suzume_Io_Illya_Shinobu-comment"
 		//zrevrangebyscore 2.5.0-Aoi_Suzume_Io_Illya_Shinobu-Aoi_Suzume_Io_Illya_Shinobu-tags 1000 0
 		//"Fengtorin#5328"
@@ -301,7 +306,7 @@ async function battle(r_client, message, args){
 			return console.log("Error in battle defense team scores:" + err);
 		}
 		if(results === null || results.length === 0){ // No teams exist!
-			submitFirstTeam(r_client, message, def_team, version);
+			submitTeam(r_client, message, def_team, version, "No teams exist to defeat that team. ");
 		}else{ // Teams exist!
 			const setsAsync = promisify(r_client.zrevrangebyscore).bind(r_client);
 			let tot_cnt = results.length;					
@@ -320,7 +325,9 @@ async function battle(r_client, message, args){
 				let rand = Math.floor(((tot_cnt - 2*top_cnt)/2)*Math.random() + 2*top_cnt);
 				off_teams.addTeam(results[rand], results[rand+1], await getAsync(team_str+"-"+results[rand]));
 			}
-			displayAttackResults(message, off_teams);
+			displayAttackResults(message, off_teams).then(() => {
+				submitTeam(r_client, message, def_team, version);
+			});
 		}
 	});
 }
