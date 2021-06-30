@@ -33,8 +33,10 @@ function addComment(r_client, message, version, user, def_team, off_team){
 			}
 		})
 		.catch(collected => {
-			console.log("Comment collected:");
-			console.log(collected);
+			if(collected.length > 0){
+				console.log("Comment collected:");
+				console.log(collected);
+			}
 		});
 }
 
@@ -108,7 +110,7 @@ function RedisDefOffStr(def_team, off_team, version){
 }
 
 // When a team is from an older version, this function updates its version
-function redisUpdateTeamVersion(r_client, score_str, def_str, off_str, team_vers, version, score, tag){
+function redisUpdateTeamVersion(r_client, message, score_str, def_str, off_str, team_vers, version, score, tag){
 	// Update version	
 	r_client.set(def_str + "-" + off_str, version, function(err, reply){
 		console.log(`Version updated: ${def_str}-${off_str}:${reply}`);
@@ -218,7 +220,7 @@ function redisAddTeam(r_client, message, def_team, off_team, version){
 				}
 				r_client.zincrby(def_str, upd_score, off_str);
 			}else{ // Known team was an outdated version
-				redisUpdateTeamVersion(r_client, score_str, def_str, off_str, team_vers, version, score, message.author.tag);
+				redisUpdateTeamVersion(r_client, message, score_str, def_str, off_str, team_vers, version, score, message.author.tag);
 			}
 		}
 	});
