@@ -70,7 +70,7 @@ function com(command, args, client, message, state){
 			};
 			
 			let del_arr = [ "rec", "def", "att" ];
-			meta_h.updateAllChars(r_client, add_obj, del_obj);
+			meta_h.updateAllChars(r_client, add_obj, del_arr);
 		}else if(command === 'add-nick'){
 			if(args.length !== 2){
 				return message.channel.send("Not enough arguments to add nickname. Need char name and nick name.");

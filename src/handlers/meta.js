@@ -60,10 +60,10 @@ async function updateAllChars(r_client, add_obj = false, del_arr = false){
 
 	let max_id = await getAsync('cur_char_id');
 	for(let id = 0; id < max_id; id++){
-		if(add_obj !== false) r_client.hmset(`char_data_${id}`, char_obj);
-		if(del_obj !== false) {
-			for(const del_str in del_arr){
-				r_client.hdel(`char_data_${id}`, del_str);
+		if(add_obj !== false) r_client.hmset(`char_data_${id}`, add_obj);
+		if(del_arr !== false) {
+			for(let i in del_arr){
+				r_client.hdel(`char_data_${id}`, del_arr[i]);
 			}
 		}
 	}
