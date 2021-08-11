@@ -47,6 +47,31 @@ async function tester(r_client, args){
 
 
 function com(command, args, client, message, state){
+	// Development commands
+	if(message.channel.id == "845007607055253565" || message.channel.id == "845007583060426794"){
+		if(command === 'fight' || command === 'f'){
+			if(args.length === 5){ // Full party
+				bat_h.battle(r_client, message, args);
+			}else{ // Wrong party size
+				message.channel.send("Enemy party needs 5 members.");
+			}
+		}
+	}
+	
+	
+	// Live commands
+	if(command === 'mfk' || command === 'mdk'){
+		game_h.mfk(r_client, message);
+	}else if(command === 'love-love'){
+		game_h.love(r_client, message, message.author.tag);
+	}else if(command === 'char'){
+		meta_h.viewChar(r_client, message, args);
+	}else if(command === 'version'){
+		meta_h.getVer(r_client, message);
+	}
+	
+	
+	// Dev specific testing
 	if(message.author.tag === 'Fengtorin#5328'){
 		if(command === 'restart'){
 			console.log(`${message.author.tag} is requesting restart from task-bot`);
@@ -163,21 +188,6 @@ function com(command, args, client, message, state){
 		}
 	}
 	
-	if(command === 'mfk' || command === 'mdk'){
-		game_h.mfk(r_client, message);
-	}else if(command === 'love-love'){
-		game_h.love(r_client, message, message.author.tag);
-	}else if(command === 'fight' || command === 'f'){
-		if(args.length === 5){ // Full party
-			bat_h.battle(r_client, message, args);
-		}else{ // Wrong party size
-			message.channel.send("Enemy party needs 5 members.");
-		}
-	}else if(command === 'char'){
-		meta_h.viewChar(r_client, message, args);
-	}else if(command === 'version'){
-		meta_h.getVer(r_client, message);
-	}
 	
 	/*
 	// Example Hello script to show various tools
