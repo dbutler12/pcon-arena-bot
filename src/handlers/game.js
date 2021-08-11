@@ -59,8 +59,11 @@ function submitMFK(r_client, message, team){
 					let name = message.author.username;
 					let tag  = message.author.tag;
 					message.channel.send(`${name} would marry :${raw_team[0]}:, date :${raw_team[1]}:, and murder poor :${raw_team[2]}:`);
-					r_client.hincrby(`${tag}_wifed`,raw_team[0],1);
-					r_client.hincrby(`${tag}_dated`,raw_team[1],1);
+					r_client.hincrby(`char_data_${team['char_' + raw_team[0]]['id']}`, 'wifed',  1);
+					r_client.hincrby(`char_data_${team['char_' + raw_team[1]]['id']}`, 'dated',  1);
+					r_client.hincrby(`char_data_${team['char_' + raw_team[2]]['id']}`, 'killed', 1);
+					r_client.hincrby(`${tag}_wifed`, raw_team[0],1);
+					r_client.hincrby(`${tag}_dated`, raw_team[1],1);
 					r_client.hincrby(`${tag}_killed`,raw_team[2],1);
 				}else{
 					//TODO: Consider not having a return message here, or something more generic

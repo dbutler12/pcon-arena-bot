@@ -62,14 +62,10 @@ function com(command, args, client, message, state){
 			meta_h.updateChar(r_client, message, args);
 		}else if(command === 'update-all-chars'){
 			let add_obj = {
-				pvp_rec:"0-0",
-				cb_rec:"0-0",
-				wifed:0,
-				dated:0,
-				killed:0
+				id:-1
 			};
 			
-			let del_arr = [ "rec", "def", "att" ];
+			let del_arr = false;
 			meta_h.updateAllChars(r_client, add_obj, del_arr);
 		}else if(command === 'add-nick'){
 			if(args.length !== 2){

@@ -60,6 +60,7 @@ async function updateAllChars(r_client, add_obj = false, del_arr = false){
 
 	let max_id = await getAsync('cur_char_id');
 	for(let id = 0; id < max_id; id++){
+		add_obj['id'] = id;
 		if(add_obj !== false) r_client.hmset(`char_data_${id}`, add_obj);
 		if(del_arr !== false) {
 			for(let i in del_arr){
@@ -90,6 +91,7 @@ function addChar(r_client, c_name, position){
 		};
 		let nick_obj = {};
 		nick_obj[c_name] = id;
+		char_obj['id'] = id;
 		r_client.hmset(`char_data_${id}`, char_obj);
 		r_client.hmset('char_nick', nick_obj);
 		r_client.incr('cur_char_id');

@@ -1,6 +1,7 @@
-function Unit(name, position){
+function Unit(name, position, id = -1){
 	this.name = name;
 	this.position = position;
+	this.id = id;
 }
 
 
@@ -22,16 +23,17 @@ function Team(data, num, team2 = null, team3 = null){
 	
 	this.init = function() {
 		if(num === 0) return;
-		let unit = new Unit(data[0]['name'], data[0]['position']);
+		let unit = new Unit(data[0]['name'], data[0]['position'], data[0]['id']);
 		if(!this.check(unit)){
 			//TODO: modify this, because don't always need to know when team can't be made
 			return console.log(`Cannot make team. Unit ${data[0]['name']} already in previous team.`);
 		}
 		this.units[0] = unit;
+		this['char_' + unit['name']] = unit;
 		this[unit['name']] = true;
 		
 		for(let i = 1; i < this.num; i++){
-			let cur = new Unit(data[i]['name'], data[i]['position']);
+			let cur = new Unit(data[i]['name'], data[i]['position'], data[i]['id']);
 			if(!this.check(cur)){
 				return console.log(`Cannot make team. Unit ${cur['name']} already in previous team.`);
 			}
@@ -40,13 +42,15 @@ function Team(data, num, team2 = null, team3 = null){
 					this.units[j+1] = this.units[j];
 					if(j === 0){
 						this.units[j] = cur;
-						this[cur['name']] = true;
+						this['char_' + cur['name']] = cur;
+						this[cur['name']] = cur;
 					}
 				}else if(this.units[j]['position'] < cur['position']){ // Invalid team
 					this.num = -1
 					return;
 				}else{
 					this.units[j + 1] = cur;
+					this['char_' + cur['name']] = cur;
 					this[cur['name']] = true;
 					break;
 				}
