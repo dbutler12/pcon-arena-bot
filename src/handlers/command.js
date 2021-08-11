@@ -165,6 +165,8 @@ function com(command, args, client, message, state){
 	
 	if(command === 'mfk' || command === 'mdk'){
 		game_h.mfk(r_client, message);
+	}else if(command === 'love-love'){
+		game_h.love(r_client, message, message.author.tag);
 	}else if(command === 'fight' || command === 'f'){
 		if(args.length === 5){ // Full party
 			bat_h.battle(r_client, message, args);
