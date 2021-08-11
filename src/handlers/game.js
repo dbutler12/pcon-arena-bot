@@ -26,6 +26,17 @@ async function mfk(r_client, message){
 	submitMFK(r_client, message, team);
 }
 
+function printLove(obj, love_str){
+	let count = 1;
+	let len = Object.keys(obj).length;
+	for(let o in obj){
+		love_str = love_str + `${o}:${obj[o]}`;
+		if(count != len && count%5 != 0) love_str = love_str + ", ";
+		if(count%5 == 0) love_str = love_str + "\n";
+		count = count + 1;
+	}
+	return love_str;
+}
 
 async function love(r_client, message, usertag, args){
 	const { promisify } = require('util');
@@ -40,32 +51,13 @@ async function love(r_client, message, usertag, args){
 	let count = 0;
 	let len = Object.keys(wifed).length;
 	m_str = m_str + "\nWifed:\n";
-	for(let w in wifed){
-		m_str = m_str + `${w}:${wifed[w]}`;
-		if(count != len-1 && count%5 != 0) m_str = m_str + ", ";
-		if(count%5 == 0) m_str = m_str + "\n";
-		count = count + 1;
-	}
+	m_str = printLove(wifed, m_str);
 	
-	count = 0;
-	len = Object.keys(dated).length;
-	m_str = m_str + "\nDated:\n";
-	for(let d in dated){
-		m_str = m_str + `${d}:${dated[d]}`;
-		if(count != len-1 && count%5 != 0) m_str = m_str + ", ";
-		if(count%5 == 0) m_str = m_str + "\n";
-		count = count + 1;
-	}
-	
-	count = 0;
-	len = Object.keys(killed).length;
-	m_str = m_str + "\nDated:\n";
-	for(let k in killed){
-		m_str = m_str + `${k}:${killed[k]}`;
-		if(count != len-1 && count%5 != 0) m_str = m_str + ", ";
-		if(count%5 == 0) m_str = m_str + "\n";
-		count = count + 1;
-	}
+	m_str = m_str +"\n\nDated:\n";
+	m_str = printLoved(dated, m_str);
+
+	m_str = m_str + "\n\nKilled:\n";
+	m_str = printLoved(killed, m_str);
 	
 	console.log(m_str);
 	message.channel.send(m_str);
