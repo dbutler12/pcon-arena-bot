@@ -22,7 +22,7 @@ async function mfk(r_client, message){
 	
 	if(lockout > 9) return message.channel.send("Failed to randomize.");
 	
-	let team = redis_h.redisIDToTeam(r_client, message, id_arr);
+	let team = redis_h.idToTeam(r_client, message, id_arr);
 	message.channel.send(team.unitsEmo());
 }
 

@@ -1,3 +1,5 @@
+const Units  = require('../units');
+
 function createIDArray(chars, nick){
 	let id_arr = [];
 	let error = null;
