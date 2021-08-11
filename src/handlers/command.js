@@ -60,6 +60,17 @@ function com(command, args, client, message, state){
 			meta_h.addChar(r_client, args[0], args[1]);
 		}else if(command === 'mod-char'){
 			meta_h.updateChar(r_client, message, args);
+		}else if(command === 'update-all-chars'){
+			let add_obj = {
+				pvp_rec:"0-0",
+				cb_rec:"0-0",
+				wifed:0,
+				dated:0,
+				killed:0
+			};
+			
+			let del_obj = { "rec", "def", "att" };
+			meta_h.updateAllChars(r_client, add_obj, del_obj);
 		}else if(command === 'add-nick'){
 			if(args.length !== 2){
 				return message.channel.send("Not enough arguments to add nickname. Need char name and nick name.");

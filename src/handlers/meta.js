@@ -53,6 +53,18 @@ function addNick(r_client, message, c_name, n_name){
 	});
 }
 
+async function updateAllChars(r_client, add_obj = false, del_arr = false){
+	//Promisify redis, since it doesn't directly support promises			
+	const { promisify } = require('util');
+	const getAsync = promisify(r_client.get).bind(r_client);
+
+	let max_id = await getAsync('cur_char_id');
+	for(let id = 0; id < max_id; id++){
+		if(add_obj !== false) r_client.hmset(`char_data_${id}`, char_obj);
+		if(del_obj !== false) r_client.hdel(`char_data_${id}`, del_obj);
+	}
+}
+
 
 function addChar(r_client, c_name, position){
 	//Promisify redis, since it doesn't directly support promises			
@@ -66,9 +78,11 @@ function addChar(r_client, c_name, position){
 		let char_obj = {
 			name:c_name,
 			position:position,
-			rec:"0-0",
-			def:0,
-			att:0
+			pvp_rec:"0-0",
+			cb_rec:"0-0",
+			wifed:0,
+			dated:0,
+			killed:0
 		};
 		let nick_obj = {};
 		nick_obj[c_name] = id;
@@ -148,4 +162,4 @@ function viewChar(r_client, message, args){
 		});
 }
 
-module.exports = { addNick, addChar, viewChar, updateChar, updateVer, getVer };
+module.exports = { addNick, addChar, viewChar, updateChar, updateAllChars, updateVer, getVer };
