@@ -3,7 +3,7 @@ const Units  = require('../units');
 function addComment(r_client, message, version, user, def_team, off_team){
 	message.channel.awaitMessages(user, {
 			max: 1,
-			time: 25000,
+			time: 50000,
 			errors: ['time']
 		})
 		.then(message => {
@@ -15,7 +15,7 @@ function addComment(r_client, message, version, user, def_team, off_team){
 				.substring(PREFIX.length);
 				
 				let [command, ...comment] = raw_comment.split(/\s+/);
-				comment = comment.join(" ");
+				comment = comment.join(" ").substring(0,200);
 				
 				if(command === 'com'){
 					let usr_tag = message.author.tag;
@@ -69,7 +69,10 @@ async function redisPullTeam(r_client, message, chars){
 		
 		let nick = await hashAsync('char_nick');
 		let {error, id_arr} = createIDArray(chars, nick);
-		if(error) return message.channel.send(error);
+		if(error){
+			message.channel.send(error);
+			return new Units.Team([], 0);
+		}
 		
 		let results = [];
 		for(let i = 0; i < id_arr.length; i++){
@@ -227,12 +230,12 @@ async function redisAddTeam(r_client, message, def_team, off_team, version){
 }
 
 
-function submitTeam(r_client, message, version, def_team, comment = ""){
+function submitTeam(r_client, message, version, def_team, add_team_comment = ""){
 	let user = m => m.author.id === message.author.id;
-  message.channel.send(`${comment}If you want to add a team: Submit 5 units to add a new team.\nExample: !add Io Shinobu Suzume Ilya Aoi.`).then(() => {
+  message.channel.send(`${add_team_comment}If you want to add a team: Submit 5 units to add a new team.\nExample: !add Io Shinobu Suzume Ilya Aoi.`).then(() => {
     message.channel.awaitMessages(user, {
         max: 1,
-        time: 25000,
+        time: 50000,
         errors: ['time']
       })
       .then(async function(message){
@@ -269,8 +272,10 @@ function submitTeam(r_client, message, version, def_team, comment = ""){
 				}
       })
       .catch(collected => {
-      	console.log("First time add team collected:");
-        console.log(collected);
+      	if(collected.length > 0){
+		    	console.log("First time add team collected:");
+		      console.log(collected);
+		    }
       });
   })
 }

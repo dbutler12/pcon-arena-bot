@@ -8,31 +8,31 @@ async function mfk(r_client, message){
 	char_id = parseInt(char_id)-1;
 	
 	let id_arr = [];
-	id_arr[0] = Math.random()*char_id;
-	id_arr[1] = Math.random()*char_id;
-	id_arr[2] = Math.random()*char_id;
+	id_arr[0] = Math.floor(Math.random()*char_id);
+	id_arr[1] = Math.floor(Math.random()*char_id);
+	id_arr[2] = Math.floor(Math.random()*char_id);
 	
 	let lockout = 0;
 	while((id_arr[0] === id_arr[1] || id_arr[0] === id_arr[2] || id_arr[1] === id_arr[2]) && lockout < 10){
-		id_arr[0] = Math.random()*char_id;
-		id_arr[1] = Math.random()*char_id;
-		id_arr[2] = Math.random()*char_id;
+		id_arr[0] = Math.floor(Math.random()*char_id);
+		id_arr[1] = Math.floor(Math.random()*char_id);
+		id_arr[2] = Math.floor(Math.random()*char_id);
 		lockout++;
 	}
 	
 	if(lockout > 9) return message.channel.send("Failed to randomize.");
 	
-	let team = redis_h.idToTeam(r_client, message, id_arr);
+	let team = await redis_h.idToTeam(r_client, message, id_arr);
 	message.channel.send(team.unitsEmo());
 }
 
 
 
-/*
 
-function submitTeam(r_client, message, version, def_team, add_team_comment = ""){
+
+function submitMFK(r_client, message, version, team){
 	let user = m => m.author.id === message.author.id;
-  message.channel.send(`${add_team_comment}If you want to add a team: Submit 5 units to add a new team.\nExample: !add Io Shinobu Suzume Ilya Aoi.`).then(() => {
+  message.channel.send(`Marry Date Kill:\n${team.unitsEmo()}`).then(() => {
     message.channel.awaitMessages(user, {
         max: 1,
         time: 50000,
@@ -56,29 +56,23 @@ function submitTeam(r_client, message, version, def_team, add_team_comment = "")
 					return;
 				}		
 				
-				if(raw_team.length === 5) {
-					let off_team = await redisPullTeam(r_client, message, raw_team);
-					redisAddTeam(r_client, message, def_team, off_team, version)
+				if(raw_team.length === 3 && team.findUnits(raw_team)) {
+					let name = message.author.username;
+					message.channel.send(`${name} would marry :${raw_team[0]}:, date ${raw_team[1]}, and murder poor ${raw_team[2]}`);
 					
-					message.channel.send("Team added!");
-					
-					// TODO: Modularize this, so comments can just be added at any point
-					message.channel.send(`If you would like to add a comment to this team, use !com Comment\nExample: !com Team only works with 4*+ Io.`).then(() => {
-						addComment(r_client, message, version, user, def_team, off_team);
-					})
 				}else{
 					//TODO: Consider not having a return message here, or something more generic
-					message.channel.send("Invalid team.");
+					message.channel.send("Entered wrong units.");
 				}
       })
       .catch(collected => {
       	if(collected.length > 0){
-		    	console.log("First time add team collected:");
+		    	console.log("submitMFK Collected:");
 		      console.log(collected);
 		    }
       });
   })
 }
-*/
+
 
 module.exports = { mfk };
