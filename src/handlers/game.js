@@ -57,9 +57,8 @@ function submitMFK(r_client, message, team){
 
 				if(raw_team.length === 3 && team.compareTeam(validate) === 3) {
 					let name = message.author.username;
-					let nick = message.author.nickname;
 					let tag  = message.author.tag;
-					message.channel.send(`${nick} would marry :${raw_team[0]}:, date :${raw_team[1]}:, and murder poor :${raw_team[2]}:`);
+					message.channel.send(`${name} would marry :${raw_team[0]}:, date :${raw_team[1]}:, and murder poor :${raw_team[2]}:`);
 					r_client.hincrby(`${tag}_wifed`,raw_team[0],1);
 					r_client.hincrby(`${tag}_dated`,raw_team[1],1);
 					r_client.hincrby(`${tag}_killed`,raw_team[2],1);
