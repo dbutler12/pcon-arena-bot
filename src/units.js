@@ -21,6 +21,7 @@ function Team(data, num, team2 = null, team3 = null){
 	}
 	
 	this.init = function() {
+		if(num === 0) return;
 		let unit = new Unit(data[0]['name'], data[0]['position']);
 		if(!this.check(unit)){
 			//TODO: modify this, because don't always need to know when team can't be made
@@ -55,6 +56,10 @@ function Team(data, num, team2 = null, team3 = null){
 	
 	this.unitsStr = function(){
 		return this.units.map(u => u.name).join('_');
+	}
+	
+	this.unitsEmo = function(){
+		return ":" + this.units.map(u => u.name).join("::") + ":";
 	}
 	
 	this.init();

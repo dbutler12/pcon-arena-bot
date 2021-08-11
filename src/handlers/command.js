@@ -6,6 +6,7 @@ r_client.on('connect', function() {
 const bat_h  = require('./battle');
 const meta_h = require('./meta');
 const Units  = require('../units');
+const game_h = require('./game');
 
 
 async function tester(r_client, args){
@@ -155,7 +156,9 @@ function com(command, args, client, message, state){
 		}
 	}
 	
-	if(command === 'fight' || command === 'f'){
+	if(command === 'mfk' || command === 'mdk'){
+		game_h.mfk(r_client, message);
+	}else if(command === 'fight' || command === 'f'){
 		if(args.length === 5){ // Full party
 			bat_h.battle(r_client, message, args);
 		}else{ // Wrong party size
