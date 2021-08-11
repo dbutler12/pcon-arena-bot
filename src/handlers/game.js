@@ -22,7 +22,7 @@ async function mfk(r_client, message){
 	
 	if(lockout > 9) return message.channel.send("Failed to randomize.");
 	
-	let team = await redis_h.idToTeam(r_client, message, id_arr);
+	let team = await redis_h.idToTeam(r_client, id_arr);
 	submitMFK(r_client, message, team);
 }
 
@@ -47,16 +47,13 @@ function submitMFK(r_client, message, team){
 		  		.trim()
 		  		.substring(PREFIX.length)
 		  		
-		  		let [command, ...raw] = raw_message.split(/\s+/);
-		  		raw_team = raw;
-		  		if(command !== 'add'){
-		  			return;
-		  		}
+		  		raw_team = raw_message.split(/\s+/);
+
 				}else{
 					return;
 				}		
 				
-				if(raw_team.length === 3 && team.findUnits(raw_team)) {
+				if(raw_team.length === 3 && team.compareTeam(await redis_h.charsToTeam(r_client, message, raw_team))) {
 					let name = message.author.username;
 					message.channel.send(`${name} would marry :${raw_team[0]}:, date ${raw_team[1]}, and murder poor ${raw_team[2]}`);
 					

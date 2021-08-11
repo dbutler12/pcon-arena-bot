@@ -76,6 +76,14 @@ function Team(data, num, team2 = null, team3 = null){
 		return true;
 	}
 	
+	this.compareTeam = function(team){
+		let count = 0;
+		for(const u in team.units){
+			if(this.findUnit(u.name)) count++;
+		}
+		return count;
+	}
+	
 	this.init();
 }
 
