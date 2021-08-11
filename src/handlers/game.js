@@ -31,7 +31,7 @@ function printLove(obj, love_str){
 	let len = Object.keys(obj).length;
 	for(let o in obj){
 		love_str = love_str + `${o}:${obj[o]}`;
-		if(count != len && count%5 != 0) love_str = love_str + ", ";
+		if(count != len && count%5 != 0) love_str = love_str + "  ";
 		if(count%5 == 0) love_str = love_str + "\n";
 		count = count + 1;
 	}
