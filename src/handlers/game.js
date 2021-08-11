@@ -53,11 +53,11 @@ async function love(r_client, message, usertag, args){
 	m_str = m_str + "\nWifed:\n";
 	m_str = printLove(wifed, m_str);
 	
-	m_str = m_str +"\n\nDated:\n";
-	m_str = printLoved(dated, m_str);
+	m_str = m_str +"\nDated:\n";
+	m_str = printLove(dated, m_str);
 
-	m_str = m_str + "\n\nKilled:\n";
-	m_str = printLoved(killed, m_str);
+	m_str = m_str + "\nKilled:\n";
+	m_str = printLove(killed, m_str);
 	
 	console.log(m_str);
 	message.channel.send(m_str);
