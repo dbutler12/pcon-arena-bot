@@ -1,7 +1,7 @@
 const Units  = require('../units');
-const redis  = require('redis-methods');
+const redis_h  = require('./redis-methods');
 
-function mfk(r_client, message){
+async function mfk(r_client, message){
 	const { promisify } = require('util');
 	const getAsync = promisify(r_client.get).bind(r_client);
 	let char_id = await getAsync('cur_char_id');
@@ -13,7 +13,7 @@ function mfk(r_client, message){
 	while((id_arr[1] = Math.random()*char_id) != id_arr[0]);
 	while((id_arr[2] = Math.random()*char_id) != id_arr[1] && id_arr[2] != id_arr[0]);
 	
-	let team = redis.redisIDToTeam(r_client, message, id_arr);
+	let team = redis_h.redisIDToTeam(r_client, message, id_arr);
 	message.channel.send(team.unitsEmo());
 }
 
