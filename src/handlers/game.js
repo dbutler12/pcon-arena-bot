@@ -53,9 +53,11 @@ function submitMFK(r_client, message, team){
 					return;
 				}		
 				
-				if(raw_team.length === 3 && team.compareTeam(await redis_h.charsToTeam(r_client, message, raw_team))) {
+				let validate = await redis_h.charsToTeam(r_client, message, raw_team);
+
+				if(raw_team.length === 3 && team.compareTeam(validate) === 3) {
 					let name = message.author.username;
-					message.channel.send(`${name} would marry :${raw_team[0]}:, date ${raw_team[1]}, and murder poor ${raw_team[2]}`);
+					message.channel.send(`${name} would marry :${raw_team[0]}:, date :${raw_team[1]}:, and murder poor :${raw_team[2]}:`);
 					
 				}else{
 					//TODO: Consider not having a return message here, or something more generic

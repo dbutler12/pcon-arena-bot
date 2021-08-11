@@ -62,24 +62,10 @@ function Team(data, num, team2 = null, team3 = null){
 		return ":" + this.units.map(u => u.name).join("::") + ":";
 	}
 	
-	this.findUnit = function(name){
-		for(let i = 0; i < this.num; i++){
-			if(this.units[i].name === name) return true;
-		}
-		return false;
-	}
-	
-	this.findUnits = function(units){
-		for(const u in units){
-			if(!this.findUnit(u)) return false;
-		}
-		return true;
-	}
-	
 	this.compareTeam = function(team){
 		let count = 0;
-		for(const u in team.units){
-			if(this.findUnit(u.name)) count++;
+		for(let un in team.units){
+			if(this[team.units[un].name]) count = count + 1;
 		}
 		return count;
 	}
