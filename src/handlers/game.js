@@ -23,14 +23,14 @@ async function mfk(r_client, message){
 	if(lockout > 9) return message.channel.send("Failed to randomize.");
 	
 	let team = await redis_h.idToTeam(r_client, message, id_arr);
-	message.channel.send(team.unitsEmo());
+	submitMFK(r_client, message, team);
 }
 
 
 
 
 
-function submitMFK(r_client, message, version, team){
+function submitMFK(r_client, message, team){
 	let user = m => m.author.id === message.author.id;
   message.channel.send(`Marry Date Kill:\n${team.unitsEmo()}`).then(() => {
     message.channel.awaitMessages(user, {
