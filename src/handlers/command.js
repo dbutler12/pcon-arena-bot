@@ -69,7 +69,7 @@ function com(command, args, client, message, state){
 				killed:0
 			};
 			
-			let del_obj = { "rec", "def", "att" };
+			let del_arr = [ "rec", "def", "att" ];
 			meta_h.updateAllChars(r_client, add_obj, del_obj);
 		}else if(command === 'add-nick'){
 			if(args.length !== 2){
