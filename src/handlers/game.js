@@ -9,9 +9,18 @@ async function mfk(r_client, message){
 	
 	let id_arr = [];
 	id_arr[0] = Math.random()*char_id;
-
-	while((id_arr[1] = Math.random()*char_id) != id_arr[0]);
-	while((id_arr[2] = Math.random()*char_id) != id_arr[1] && id_arr[2] != id_arr[0]);
+	id_arr[1] = Math.random()*char_id;
+	id_arr[2] = Math.random()*char_id;
+	
+	let lockout = 0;
+	while((id_arr[0] === id_arr[1] || id_arr[0] === id_arr[2] || id_arr[1] === id_arr[2]) && lockout < 10){
+		id_arr[0] = Math.random()*char_id;
+		id_arr[1] = Math.random()*char_id;
+		id_arr[2] = Math.random()*char_id;
+		lockout++;
+	}
+	
+	if(lockout > 9) return message.channel.send("Failed to randomize.");
 	
 	let team = redis_h.redisIDToTeam(r_client, message, id_arr);
 	message.channel.send(team.unitsEmo());
@@ -72,4 +81,4 @@ function submitTeam(r_client, message, version, def_team, add_team_comment = "")
 }
 */
 
-module.exports = { game };
+module.exports = { mfk };
