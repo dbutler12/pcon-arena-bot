@@ -153,11 +153,11 @@ function viewChar(r_client, d_client, message, args){
 			
   		r_client.hgetall(`char_data_${id}`, function(err, data){
   			let img = emoji_h.getEmojiString(d_client,data['name']);
-  			let str = `${img} \n`;
+  			let str = `${img}`;
   			if(args.length === 1){
 					for (const d in data) {
 						if(d == 'name'){
-							str = str + ` ${data[d]}\n`;
+							str = str + ` **${data[d]}**\n`;
 							continue
 						}
 						str = str + `${d}: ${data[d]}\n`;
