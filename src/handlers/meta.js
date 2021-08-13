@@ -138,7 +138,7 @@ function updateChar(r_client, message, args){
 }
 
 
-function viewChar(r_client, message, args){
+function viewChar(r_client, d_client, message, args){
 		r_client.hgetall('char_nick', function(err, nick) {
 			let char_str = args[0].charAt(0).toUpperCase() + args[0].substr(1).toLowerCase();
 			if(!(char_str in nick)){
@@ -149,7 +149,8 @@ function viewChar(r_client, message, args){
 			let id = nick[char_str];
 			
   		r_client.hgetall(`char_data_${id}`, function(err, data){
-  			let str = ":" + data['name'] + ": ";
+  			const img = d_client.emojis.cache.find(emoji => emoji.name === data['name']);
+  			let str = `${img} `;
   			if(args.length === 1){
 					for (const d in data) {
 						str = str + `${d}: ${data[d]}` + "\n";

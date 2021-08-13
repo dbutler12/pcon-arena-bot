@@ -65,7 +65,7 @@ function com(command, args, client, message, state){
 	}else if(command === 'love-love'){
 		game_h.love(r_client, message, message.author.tag);
 	}else if(command === 'char'){
-		meta_h.viewChar(r_client, message, args);
+		meta_h.viewChar(r_client, client, message, args);
 	}else if(command === 'version'){
 		meta_h.getVer(r_client, message);
 	}
