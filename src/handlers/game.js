@@ -77,13 +77,17 @@ function submitMFK(r_client, d_client, message, team){
       	let raw_team = "";
       	message = message.first();
       	if(message.content.startsWith(PREFIX)){
-      		console.log(message.content);
 		  		const raw_message = message.content
 		  		.trim()
 		  		.substring(PREFIX.length)
 		  		
 		  		raw_team = raw_message.split(/\s+/);
-
+					for(let i in raw_team){
+						if(raw_team[i]) == '<'){
+							raw_team[i] = raw_team[i].split(':')[1];
+						}
+					}
+					console.log(raw_team);
 				}else{
 					return;
 				}		
