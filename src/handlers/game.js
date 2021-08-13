@@ -97,7 +97,7 @@ function submitMFK(r_client, d_client, message, team){
 					let kill  = d_client.emojis.cache.find(emoji => emoji.name === raw_team[2]);
 					console.log(marry);
 					console.log(date);
-					console.log(kill):
+					console.log(kill);
 					message.channel.send(`${name} would marry :${marry}:  date :${date}:  and murder poor :${kill}:`);
 					r_client.hincrby(`char_data_${team['char_' + raw_team[0]]['id']}`, 'wifed',  1);
 					r_client.hincrby(`char_data_${team['char_' + raw_team[1]]['id']}`, 'dated',  1);
