@@ -95,9 +95,9 @@ function submitMFK(r_client, d_client, message, team){
 					let marry = d_client.emojis.cache.find(emoji => emoji.name === raw_team[0]);
 					let date  = d_client.emojis.cache.find(emoji => emoji.name === raw_team[1]);
 					let kill  = d_client.emojis.cache.find(emoji => emoji.name === raw_team[2]);
-					if(marry == undefined) marry = raw_team[0];
-					if(date == undefined) date = raw_team[1];
-					if(kill == undefined) kill = raw_team[2];
+					marry = (marry == undefined) ? raw_team[0] : marry.toString();
+					date = (date == undefined) ? raw_team[1] : date.toString();
+					kill = (kill == undefined) ? raw_team[2] : kill.toString();
 					message.channel.send(`${name} would marry ${marry}  date ${date} and murder poor ${kill}`);
 					r_client.hincrby(`char_data_${team['char_' + raw_team[0]]['id']}`, 'wifed',  1);
 					r_client.hincrby(`char_data_${team['char_' + raw_team[1]]['id']}`, 'dated',  1);
