@@ -149,7 +149,7 @@ function viewChar(r_client, message, args){
 			let id = nick[char_str];
 			
   		r_client.hgetall(`char_data_${id}`, function(err, data){
-  			let str = "";
+  			let str = ":" + data['name'] + ": ";
   			if(args.length === 1){
 					for (const d in data) {
 						str = str + `${d}: ${data[d]}` + "\n";

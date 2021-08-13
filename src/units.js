@@ -63,7 +63,7 @@ function Team(data, num, team2 = null, team3 = null){
 	}
 	
 	this.unitsEmo = function(){
-		return ":" + this.units.map(u => u.name).join("::") + ":";
+		return ":" + this.units.map(u => u.name).join(": :") + ":";
 	}
 	
 	this.compareTeam = function(team){
@@ -117,7 +117,7 @@ function Off_Teams(a_team){
 	this.teamStr = function(num){
 		let data = this[num];
 		let team = data.team.split("_");
-		let main = ":" + team.join("::") + ":  " + "Score:" + data.score + " V" + data.version;
+		let main = ":" + team.join(": :") + ":  " + "Score:" + data.score + " V" + data.version;
 		let comm = data.comment;
 		if(comm !== ""){
 			main = main + "\n" + comm;
