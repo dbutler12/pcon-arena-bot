@@ -142,8 +142,8 @@ function updateChar(r_client, message, args){
 
 function viewChar(r_client, d_client, message, args){
 		r_client.hgetall('char_nick', function(err, nick) {
-			let char_str = args[0].charAt(0).toUpperCase() + args[0].substr(1).toLowerCase();
-			char_str = emoji_h.extractCharStr(d_client, char_str);
+			let char_str = emoji_h.extractCharStr(d_client, args[0]);
+			char_str = char_str.charAt(0).toUpperCase() + char_str.substr(1).toLowerCase();
 			if(!(char_str in nick)){
 				message.channel.send(`Char ${char_str} unknown.`);
 				return;
