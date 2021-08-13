@@ -63,7 +63,7 @@ function com(command, args, client, message, state){
 	if(command === 'mfk' || command === 'mdk'){
 		game_h.mfk(r_client, client, message);
 	}else if(command === 'love-love'){
-		game_h.love(r_client, message, message.author.tag);
+		game_h.love(r_client, client, message, message.author.tag);
 	}else if(command === 'char'){
 		meta_h.viewChar(r_client, client, message, args);
 	}else if(command === 'version'){

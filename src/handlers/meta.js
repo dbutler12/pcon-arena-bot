@@ -1,3 +1,5 @@
+const emoji_h = require('../emojis');
+
 function updateVer(r_client, version){
 	r_client.multi().
 	get('cur_version').
@@ -149,11 +151,15 @@ function viewChar(r_client, d_client, message, args){
 			let id = nick[char_str];
 			
   		r_client.hgetall(`char_data_${id}`, function(err, data){
-  			const img = d_client.emojis.cache.find(emoji => emoji.name === data['name']);
+  			let img = emoji_h.getEmojiString(d_client,data['name']);
   			let str = `${img} \n`;
   			if(args.length === 1){
 					for (const d in data) {
-						str = str + `${d}: ${data[d]}` + "\n";
+						if(d == 'name'){
+							str = str + ` ${data[d]}\n`;
+							continue
+						}
+						str = str + `${d}: ${data[d]}\n`;
 					}
 				}else{
 					for(let i = 1; i < args.length; i++){

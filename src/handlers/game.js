@@ -1,5 +1,6 @@
-const Units  = require('../units');
+const Units    = require('../units');
 const redis_h  = require('./redis-methods');
+const emoji_h  = require('../emojis');
 
 async function mfk(r_client, d_client, message){
 	const { promisify } = require('util');
@@ -26,19 +27,21 @@ async function mfk(r_client, d_client, message){
 	submitMFK(r_client, d_client, message, team);
 }
 
-function printLove(obj, love_str){
+function printLove(d_client, obj, love_str){
 	let count = 1;
 	let len = Object.keys(obj).length;
 	for(let o in obj){
-		love_str = love_str + `${o}:${obj[o]}`;
+		let chara = emoji_h.getEmojiString(d_client, o);
+		love_str = love_str + `${chara}:${obj[o]}`;
 		if(count != len && count%5 != 0) love_str = love_str + "  ";
 		if(count%5 == 0) love_str = love_str + "\n";
 		count = count + 1;
 	}
+	if((count-1)%5 != 0) love_str = love_str + "\n";
 	return love_str;
 }
 
-async function love(r_client, message, usertag, args){
+async function love(r_client, d_client, message, usertag, args){
 	const { promisify } = require('util');
 	const getAsync = promisify(r_client.hgetall).bind(r_client);
 	
@@ -46,20 +49,19 @@ async function love(r_client, message, usertag, args){
 	let dated  = await getAsync(`${usertag}_dated`);
 	let killed = await getAsync(`${usertag}_killed`);
 	
-	let m_str = message.author.username;
+	let m_str = `**${message.author.username}**`;
 	
 	let count = 0;
 	let len = Object.keys(wifed).length;
-	m_str = m_str + "\nWifed:\n";
-	m_str = printLove(wifed, m_str);
+	m_str = m_str + "\n**__Wifed__**\n";
+	m_str = printLove(d_client, wifed, m_str);
 	
-	m_str = m_str +"\nDated:\n";
-	m_str = printLove(dated, m_str);
+	m_str = m_str +"\n**__Dated__**\n";
+	m_str = printLove(d_client, dated, m_str);
 
-	m_str = m_str + "\nKilled:\n";
-	m_str = printLove(killed, m_str);
-	
-	console.log(m_str);
+	m_str = m_str + "\n**__Killed__**:\n";
+	m_str = printLove(d_client, killed, m_str);
+
 	message.channel.send(m_str);
 }
 
@@ -83,11 +85,10 @@ function submitMFK(r_client, d_client, message, team){
 		  		
 		  		raw_team = raw_message.split(/\s+/);
 					for(let i in raw_team){
-						if(raw_team[i]) == '<'){
+						if(raw_team[i].charAt(0) == '<'){
 							raw_team[i] = raw_team[i].split(':')[1];
 						}
 					}
-					console.log(raw_team);
 				}else{
 					return;
 				}		
@@ -97,12 +98,10 @@ function submitMFK(r_client, d_client, message, team){
 				if(raw_team.length === 3 && team.compareTeam(validate) === 3) {
 					let name = message.author.username;
 					let tag  = message.author.tag;
-					let marry = d_client.emojis.cache.find(emoji => emoji.name === raw_team[0]);
-					let date  = d_client.emojis.cache.find(emoji => emoji.name === raw_team[1]);
-					let kill  = d_client.emojis.cache.find(emoji => emoji.name === raw_team[2]);
-					marry = (marry == undefined) ? raw_team[0] : marry.toString();
-					date = (date == undefined) ? raw_team[1] : date.toString();
-					kill = (kill == undefined) ? raw_team[2] : kill.toString();
+					let marry = emoji_h.getEmojiString(d_client,raw_team[0]);
+					let date  = emoji_h.getEmojiString(d_client,raw_team[1]);
+					let kill  = emoji_h.getEmojiString(d_client,raw_team[2]);
+					
 					message.channel.send(`${name} would marry ${marry}  date ${date} and murder poor ${kill}`);
 					r_client.hincrby(`char_data_${team['char_' + raw_team[0]]['id']}`, 'wifed',  1);
 					r_client.hincrby(`char_data_${team['char_' + raw_team[1]]['id']}`, 'dated',  1);
