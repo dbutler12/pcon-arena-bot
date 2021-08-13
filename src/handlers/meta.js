@@ -150,7 +150,7 @@ function viewChar(r_client, d_client, message, args){
 			
   		r_client.hgetall(`char_data_${id}`, function(err, data){
   			const img = d_client.emojis.cache.find(emoji => emoji.name === data['name']);
-  			let str = `${img} `;
+  			let str = `${img} \n`;
   			if(args.length === 1){
 					for (const d in data) {
 						str = str + `${d}: ${data[d]}` + "\n";

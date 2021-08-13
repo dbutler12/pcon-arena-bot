@@ -62,8 +62,13 @@ function Team(data, num, team2 = null, team3 = null){
 		return this.units.map(u => u.name).join('_');
 	}
 	
-	this.unitsEmo = function(){
-		return ":" + this.units.map(u => u.name).join(": :") + ":";
+	this.unitsEmo = function(d_client){
+		let str = "";
+		for(let u in this.units){
+			const emo = d_client.emojis.cache.find(emoji => emoji.name === this.units[u].name);
+			str = str + emo + " ";
+		}
+		return str;
 	}
 	
 	this.compareTeam = function(team){

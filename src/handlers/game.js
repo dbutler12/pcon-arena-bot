@@ -1,7 +1,7 @@
 const Units  = require('../units');
 const redis_h  = require('./redis-methods');
 
-async function mfk(r_client, message){
+async function mfk(r_client, d_client, message){
 	const { promisify } = require('util');
 	const getAsync = promisify(r_client.get).bind(r_client);
 	let char_id = await getAsync('cur_char_id');
@@ -23,7 +23,7 @@ async function mfk(r_client, message){
 	if(lockout > 9) return message.channel.send("Failed to randomize.");
 	
 	let team = await redis_h.idToTeam(r_client, id_arr);
-	submitMFK(r_client, message, team);
+	submitMFK(r_client, d_client, message, team);
 }
 
 function printLove(obj, love_str){
@@ -64,9 +64,9 @@ async function love(r_client, message, usertag, args){
 }
 
 
-function submitMFK(r_client, message, team){
+function submitMFK(r_client, d_client, message, team){
 	let user = m => m.author.id === message.author.id;
-  message.channel.send(`Marry Date Kill:\n${team.unitsEmo()}`).then(() => {
+  message.channel.send(`Marry Date Kill:\n${team.unitsEmo(d_client)}`).then(() => {
     message.channel.awaitMessages(user, {
         max: 1,
         time: 50000,
@@ -92,7 +92,13 @@ function submitMFK(r_client, message, team){
 				if(raw_team.length === 3 && team.compareTeam(validate) === 3) {
 					let name = message.author.username;
 					let tag  = message.author.tag;
-					message.channel.send(`${name} would marry :${raw_team[0]}:  date :${raw_team[1]}:  and murder poor :${raw_team[2]}:`);
+					let marry = d_client.emojis.cache.find(emoji => emoji.name === raw_team[0]);
+					let date  = d_client.emojis.cache.find(emoji => emoji.name === raw_team[1]);
+					let kill  = d_client.emojis.cache.find(emoji => emoji.name === raw_team[2]);
+					console.log(marry);
+					console.log(date);
+					console.log(kill):
+					message.channel.send(`${name} would marry :${marry}:  date :${date}:  and murder poor :${kill}:`);
 					r_client.hincrby(`char_data_${team['char_' + raw_team[0]]['id']}`, 'wifed',  1);
 					r_client.hincrby(`char_data_${team['char_' + raw_team[1]]['id']}`, 'dated',  1);
 					r_client.hincrby(`char_data_${team['char_' + raw_team[2]]['id']}`, 'killed', 1);
