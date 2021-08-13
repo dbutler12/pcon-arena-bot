@@ -4,6 +4,14 @@ const PREFIX = "!";
 require('dotenv').config();
 const com_h = require('./handlers/command');
 
+global.commands = {
+	mfk: "Marry date kill game",
+	mdk: "Marry date kill game",
+	"love-love": "Personal stats for mdk game",
+	char: "Get character information",
+	version: "Get current version"
+}
+
 client.once('ready', () => {
 	console.log("Bot ready to go");
 });

@@ -3,7 +3,7 @@ function getEmojiString(d_client, character){
 	return (str == undefined) ? character : str.toString();
 }
 
-function extractCharStr(d_client, str){
+function extractCharStr(str){
 	if(str.charAt(0) == '<'){
 		str = str.split(':')[1];
 	}

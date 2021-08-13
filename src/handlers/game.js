@@ -85,8 +85,11 @@ function submitMFK(r_client, d_client, message, team){
 		  		.substring(PREFIX.length)
 		  		
 		  		raw_team = raw_message.split(/\s+/);
+		  		
+		  		if(raw_team[0] in global.commands) return;
+		  		
 					for(let i in raw_team){
-						raw_team[i] = emoji_h.extractCharStr(d_client, raw_team[i]);
+						raw_team[i] = emoji_h.extractCharStr(raw_team[i]);
 					}
 				}else{
 					return;
