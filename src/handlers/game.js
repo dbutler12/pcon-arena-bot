@@ -33,7 +33,7 @@ function printLove(d_client, obj, love_str){
 	for(let o in obj){
 		let chara = emoji_h.getEmojiString(d_client, o);
 		love_str = love_str + `${chara}: **${obj[o]}**`;
-		if(count != len && count%5 != 0) love_str = love_str + "  ";
+		if(count != len && count%5 != 0) love_str = love_str + "     ";
 		if(count%5 == 0) love_str = love_str + "\n";
 		count = count + 1;
 	}
