@@ -63,13 +63,15 @@ function Team(data, num, team2 = null, team3 = null){
 	}
 	
 	this.unitsEmo = function(d_client){
-		let str = "";
+		let emo_str = "";
+		let uni_str = "";
 		for(let u in this.units){
 			let emo = d_client.emojis.cache.find(emoji => emoji.name === this.units[u].name);
 			if(emo == undefined) emo = this.units[u].name;
-			str = str + emo.toString() + " ";
+			emo_str = emo_str + emo.toString() + " ";
+			uni_str = uni_str + this.units[u].name + " ";
 		}
-		return str;
+		return [emo_str, uni_str];
 	}
 	
 	this.compareTeam = function(team){

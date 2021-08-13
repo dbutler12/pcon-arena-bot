@@ -67,8 +67,9 @@ async function love(r_client, d_client, message, usertag, args){
 
 
 function submitMFK(r_client, d_client, message, team){
+	let units_strs = team.unitsEmo(d_client);
 	let user = m => m.author.id === message.author.id;
-  message.channel.send(`Marry Date Kill:\n${team.unitsEmo(d_client)}`).then(() => {
+  message.channel.send(`Marry Date Kill:\n${units_strs[0]}\n${units_strs[1]}`).then(() => {
     message.channel.awaitMessages(user, {
         max: 1,
         time: 50000,
