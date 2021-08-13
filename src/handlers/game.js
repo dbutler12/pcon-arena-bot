@@ -85,9 +85,7 @@ function submitMFK(r_client, d_client, message, team){
 		  		
 		  		raw_team = raw_message.split(/\s+/);
 					for(let i in raw_team){
-						if(raw_team[i].charAt(0) == '<'){
-							raw_team[i] = raw_team[i].split(':')[1];
-						}
+						raw_team[i] = emoji_h.extractCharStr(d_client, raw_team[i]);
 					}
 				}else{
 					return;

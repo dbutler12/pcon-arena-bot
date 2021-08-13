@@ -3,4 +3,11 @@ function getEmojiString(d_client, character){
 	return (str == undefined) ? character : str.toString();
 }
 
-module.exports = { getEmojiString };
+function extractCharStr(d_client, str){
+	if(str.charAt(0) == '<'){
+		str = str.split(':')[1];
+	}
+	return str;
+}
+
+module.exports = { getEmojiString, extractCharStr };
