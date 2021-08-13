@@ -77,6 +77,7 @@ function submitMFK(r_client, d_client, message, team){
       	let raw_team = "";
       	message = message.first();
       	if(message.content.startsWith(PREFIX)){
+      		console.log(message.content);
 		  		const raw_message = message.content
 		  		.trim()
 		  		.substring(PREFIX.length)
