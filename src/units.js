@@ -67,7 +67,7 @@ function Team(data, num, team2 = null, team3 = null){
 		for(let u in this.units){
 			let emo = d_client.emojis.cache.find(emoji => emoji.name === this.units[u].name);
 			if(emo == undefined) emo = this.units[u].name;
-			str = str + emo + " ";
+			str = str + emo.toString() + " ";
 		}
 		return str;
 	}
