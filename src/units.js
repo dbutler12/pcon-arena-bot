@@ -65,7 +65,8 @@ function Team(data, num, team2 = null, team3 = null){
 	this.unitsEmo = function(d_client){
 		let str = "";
 		for(let u in this.units){
-			const emo = d_client.emojis.cache.find(emoji => emoji.name === this.units[u].name);
+			let emo = d_client.emojis.cache.find(emoji => emoji.name === this.units[u].name);
+			if(emo == undefined) emo = this.units[u].name;
 			str = str + emo + " ";
 		}
 		return str;
