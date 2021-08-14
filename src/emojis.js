@@ -4,7 +4,8 @@ function getEmojiString(d_client, character){
 }
 
 function extractCharStr(str){
-	if(str.charAt(0) == '<'){
+	let c = str.charAt(0);
+	if(c == '<' || c == ':'){ // The two current options for an emoji
 		str = str.split(':')[1];
 	}
 	return str;
