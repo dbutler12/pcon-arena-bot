@@ -36,7 +36,9 @@ async function charsToTeam(r_client, message, chars){
 		
 		let results = [];
 		for(let i = 0; i < id_arr.length; i++){
-			results.push(await hashAsync(`char_data_${id_arr[i]}`));
+			let data = await hashAsync(`char_data_${id_arr[i]}`);
+			chars[i] = data['name']; // Change name from nickname to real name
+			results.push(data);
 		}
 		
 		return new Units.Team(results, results.length);

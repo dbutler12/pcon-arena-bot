@@ -12,6 +12,8 @@ global.commands = {
 	version: "Get current version"
 }
 
+global.prefix = '!';
+
 client.once('ready', () => {
 	console.log("Bot ready to go");
 });
