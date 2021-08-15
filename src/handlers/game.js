@@ -188,4 +188,4 @@ function submitMFK(r_client, d_client, message, team){
 }
 */
 
-module.exports = { mfk, love, mfk_t };
+module.exports = { mfk, love };

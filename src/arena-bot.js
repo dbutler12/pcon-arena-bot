@@ -6,7 +6,6 @@ const com_h = require('./handlers/command');
 
 global.commands = {
 	mfk: "!mfk or !mdk: Marry date kill game. Bot will list 3 characters that you can choose to marry, date, or kill.(Example: Jun Yukari Io)\nAfterwards, use ! and tell the bot in order of !Marry Date Kill the characters.(Example: !Io Jun Yukari)",
-	mfk_t: "Marry date kill game tester",
 	mdk: "Marry date kill game",
 	"love-love": "Lists personal stats for mdk game",
 	char: "Use !char name to Get character information. Will accept nicknames.",
