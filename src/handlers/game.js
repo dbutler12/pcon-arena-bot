@@ -26,7 +26,7 @@ async function mfk(r_client, d_client, message){
 	if(lockout > 9) return message.channel.send("Failed to randomize.");
 	
 	let team = await redis_h.idToTeam(r_client, id_arr);
-	testSubmitMFK(r_client, d_client, message, team);
+	submitMFK(r_client, d_client, message, team);
 }
 
 
