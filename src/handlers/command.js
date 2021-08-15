@@ -19,7 +19,7 @@ function com(command, args, client, message, state){
 				message.channel.send("Enemy party needs 5 members.");
 			}
 		}else if(command === 'mfk_t'){
-			game_h.mfk_t(r_client, client, message);
+			message.channel.send("mfk has been updated to mfk_t");
 		}
 	}
 	

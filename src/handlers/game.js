@@ -4,7 +4,7 @@ const emoji_h  = require('../emojis');
 
 
 
-async function mfk_t(r_client, d_client, message){
+async function mfk(r_client, d_client, message){
 	const { promisify } = require('util');
 	const getAsync = promisify(r_client.get).bind(r_client);
 	let char_id = await getAsync('cur_char_id');
@@ -30,7 +30,7 @@ async function mfk_t(r_client, d_client, message){
 }
 
 
-function testSubmitMFK(r_client, d_client, message, team){
+function submitMFK(r_client, d_client, message, team){
 	let units_strs = team.unitsEmo(d_client);
   message.channel.send(`Marry Date Kill:\n${units_strs[0]}\n${units_strs[1]}`);
   
@@ -78,35 +78,10 @@ function testSubmitMFK(r_client, d_client, message, team){
 	});
 
 	collector.on('end', collected => {
-		console.log(`End Collected ${collected.size} items.`);
+		//console.log(`End Collected ${collected.size} items.`);
 	});
 }
 
-
-async function mfk(r_client, d_client, message){
-	const { promisify } = require('util');
-	const getAsync = promisify(r_client.get).bind(r_client);
-	let char_id = await getAsync('cur_char_id');
-	char_id = parseInt(char_id)-1;
-	
-	let id_arr = [];
-	id_arr[0] = Math.floor(Math.random()*char_id);
-	id_arr[1] = Math.floor(Math.random()*char_id);
-	id_arr[2] = Math.floor(Math.random()*char_id);
-	
-	let lockout = 0;
-	while((id_arr[0] === id_arr[1] || id_arr[0] === id_arr[2] || id_arr[1] === id_arr[2]) && lockout < 10){
-		id_arr[0] = Math.floor(Math.random()*char_id);
-		id_arr[1] = Math.floor(Math.random()*char_id);
-		id_arr[2] = Math.floor(Math.random()*char_id);
-		lockout++;
-	}
-	
-	if(lockout > 9) return message.channel.send("Failed to randomize.");
-	
-	let team = await redis_h.idToTeam(r_client, id_arr);
-	submitMFK(r_client, d_client, message, team);
-}
 
 function printLove(d_client, obj, love_str){
 	let count = 1;
@@ -147,6 +122,12 @@ async function love(r_client, d_client, message, usertag, args){
 }
 
 
+
+/*
+ * Original mfk submission function, saved for reference
+ * TODO: Remove this comment and the code later
+ *
+ *
 function submitMFK(r_client, d_client, message, team){
 	let units_strs = team.unitsEmo(d_client);
 	let user = m => m.author.id === message.author.id;
@@ -205,6 +186,6 @@ function submitMFK(r_client, d_client, message, team){
       });
   })
 }
-
+*/
 
 module.exports = { mfk, love, mfk_t };
