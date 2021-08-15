@@ -176,4 +176,13 @@ function viewChar(r_client, d_client, message, args){
 		});
 }
 
-module.exports = { addNick, addChar, viewChar, updateChar, updateAllChars, updateVer, getVer };
+
+function help(message){
+	let str = "**__Commands__**\n";
+	for(let c in global.com_call){
+		str = str + c + ":" + global.com_call[c];
+	}
+	message.channel.send(str);
+}
+
+module.exports = { addNick, addChar, viewChar, updateChar, updateAllChars, updateVer, getVer, help };

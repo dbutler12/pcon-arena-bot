@@ -33,10 +33,12 @@ function com(command, args, client, message, state){
 		meta_h.viewChar(r_client, client, message, args);
 	}else if(command === 'version'){
 		meta_h.getVer(r_client, message);
+	}else if(command === 'help'){
+		meta_h.help(message);
 	}
 	
 	
-	// Dev specific testing
+	// Admin specific testing
 	if(message.author.tag === 'Fengtorin#5328'){
 		if(command === 'restart'){
 			console.log(`${message.author.tag} is requesting restart from task-bot`);
