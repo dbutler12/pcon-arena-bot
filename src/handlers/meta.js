@@ -180,7 +180,7 @@ function viewChar(r_client, d_client, message, args){
 function help(message){
 	let str = "**__Commands__**\n";
 	for(let c in global.com_call){
-		str = str + c + ":" + global.com_call[c];
+		str = str + global.com_call[c] + "\n";
 	}
 	message.channel.send(str);
 }
