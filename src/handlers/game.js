@@ -34,10 +34,13 @@ function testSubmitMFK(r_client, d_client, message, team){
 	let units_strs = team.unitsEmo(d_client);
   message.channel.send(`Marry Date Kill:\n${units_strs[0]}\n${units_strs[1]}`);
   
-	const filter = m => m.author.id === message.author.id && m.content.charAt(0) === '!';
+	const filter = response => {
+		return response.author.id === message.author.id && response.content.charAt(0) === '!';
+		// return item.answers.some(answer => answer.toLowerCase() === response.content.toLowerCase());
+	};
 	const collector = message.channel.createMessageCollector({ filter, time: 50000 });
 
-	collector.on('collect', m => {
+	collector.on('collect', async m => {
 		console.log(`Collected ${m.content}`);
     let raw_team = "";
   	//message = m.first();
@@ -281,4 +284,4 @@ function submitMFK(r_client, d_client, message, team){
 }
 
 
-module.exports = { mfk, love };
+module.exports = { mfk, love, mfk_t };

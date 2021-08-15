@@ -77,7 +77,7 @@ function com(command, args, client, message, state){
 			const channel01 = client.channels.cache.find(channel => channel.id === '833833221077860372');
 			channel01.send('restart-arena');
 			return;
-		}else if(mfk_t){
+		}else if(command === 'mfk_t'){
 			game_h.mfk_t(r_client, client, message);
 		}else if(command === 'add-char'){
 			if(args.length !== 2){
