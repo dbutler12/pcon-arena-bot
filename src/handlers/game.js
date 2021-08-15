@@ -38,7 +38,7 @@ function testSubmitMFK(r_client, d_client, message, team){
 		return response.author.id === message.author.id && response.content.charAt(0) === '!';
 		// return item.answers.some(answer => answer.toLowerCase() === response.content.toLowerCase());
 	};
-	const collector = message.channel.createMessageCollector(filter, { time: 50000 });
+	const collector = message.channel.createMessageCollector(filter, { max: 1, time: 50000, errors: ['time'] });
 
 	collector.on('collect', async m => {
     let raw_team = "";
