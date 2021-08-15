@@ -8,42 +8,6 @@ const meta_h = require('./meta');
 const Units  = require('../units');
 const game_h = require('./game');
 
-async function tester(r_client, args){
-	const { promisify } = require('util');
-	const getAsync = promisify(r_client.hgetall).bind(r_client);
-	
-	let nick = await getAsync('char_nick');
-	
-	let args2 = ["arisa", "saren", "ninon", "tamaki", "jun"];
-
-	let id_arr = [];
-	let id_arr2 = [];
-	for(let i = 0; i < args.length; i++){
-		let char_str = args[i].charAt(0).toUpperCase() + args[i].substr(1).toLowerCase();
-		let char_str2 = args2[i].charAt(0).toUpperCase() + args2[i].substr(1).toLowerCase();
-		if(!(char_str in nick)){
-			return message.channel.send(`Char ${char_str} unknown.`);
-		}
-		id_arr.push(nick[char_str]);
-		id_arr2.push(nick[char_str2]);
-	}
-
-	const units = [];
-	const units2 = [];
-	
-	for(let i = 0; i < 5; i++){
-		units.push(await getAsync(`char_data_${id_arr[i]}`));
-		units2.push(await getAsync(`char_data_${id_arr2[i]}`));
-	}
-
-	let a_team = new Units.Team(units, units.length);
-	if(a_team.num === -1) return message.channel.send("Invalid team: can't have duplicate characters.");
-	let b_team = new Units.Team(units2, units2.length, a_team);
-	
-	console.log(a_team);
-	console.log(b_team);
-}
-
 
 function com(command, args, client, message, state){
 	// Development commands
@@ -54,6 +18,8 @@ function com(command, args, client, message, state){
 			}else{ // Wrong party size
 				message.channel.send("Enemy party needs 5 members.");
 			}
+		}else if(command === 'mfk_t'){
+			game_h.mfk_t(r_client, client, message);
 		}
 	}
 	
@@ -77,8 +43,6 @@ function com(command, args, client, message, state){
 			const channel01 = client.channels.cache.find(channel => channel.id === '833833221077860372');
 			channel01.send('restart-arena');
 			return;
-		}else if(command === 'mfk_t'){
-			game_h.mfk_t(r_client, client, message);
 		}else if(command === 'add-char'){
 			if(args.length !== 2){
 				return message.channel.send("Not enough arguments to add character. Need char name and position.");
@@ -100,6 +64,20 @@ function com(command, args, client, message, state){
 			meta_h.addNick(r_client, message, args[0], args[1]);
 		}else if(command === 'update-version'){
 			meta_h.updateVer(r_client, args[0]);
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		// Test functions
 		}else if(command === 'add-sort'){
 			r_client.zadd('lifetime', 100*Math.random(), args[0]);
 		}else if(command === 'test-sort'){
@@ -223,6 +201,43 @@ function com(command, args, client, message, state){
 		});
 	}
 	*/
+}
+
+
+async function tester(r_client, args){
+	const { promisify } = require('util');
+	const getAsync = promisify(r_client.hgetall).bind(r_client);
+	
+	let nick = await getAsync('char_nick');
+	
+	let args2 = ["arisa", "saren", "ninon", "tamaki", "jun"];
+
+	let id_arr = [];
+	let id_arr2 = [];
+	for(let i = 0; i < args.length; i++){
+		let char_str = args[i].charAt(0).toUpperCase() + args[i].substr(1).toLowerCase();
+		let char_str2 = args2[i].charAt(0).toUpperCase() + args2[i].substr(1).toLowerCase();
+		if(!(char_str in nick)){
+			return message.channel.send(`Char ${char_str} unknown.`);
+		}
+		id_arr.push(nick[char_str]);
+		id_arr2.push(nick[char_str2]);
+	}
+
+	const units = [];
+	const units2 = [];
+	
+	for(let i = 0; i < 5; i++){
+		units.push(await getAsync(`char_data_${id_arr[i]}`));
+		units2.push(await getAsync(`char_data_${id_arr2[i]}`));
+	}
+
+	let a_team = new Units.Team(units, units.length);
+	if(a_team.num === -1) return message.channel.send("Invalid team: can't have duplicate characters.");
+	let b_team = new Units.Team(units2, units2.length, a_team);
+	
+	console.log(a_team);
+	console.log(b_team);
 }
 
 module.exports = { com };

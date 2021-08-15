@@ -6,6 +6,7 @@ const com_h = require('./handlers/command');
 
 global.commands = {
 	mfk: "Marry date kill game",
+	mfk_t: "Marry date kill game tester",
 	mdk: "Marry date kill game",
 	"love-love": "Personal stats for mdk game",
 	char: "Get character information",
