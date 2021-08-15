@@ -8,7 +8,7 @@ function extractCharStr(str){
 	if(c == '<' || c == ':'){ // The two current options for an emoji
 		str = str.split(':')[1];
 	}
-	return str;
+	return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 }
 
 module.exports = { getEmojiString, extractCharStr };

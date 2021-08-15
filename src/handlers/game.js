@@ -104,7 +104,7 @@ function submitMFK(r_client, d_client, message, team){
 					let date  = emoji_h.getEmojiString(d_client,raw_team[1]);
 					let kill  = emoji_h.getEmojiString(d_client,raw_team[2]);
 					
-					message.channel.send(`${name} would marry ${marry}  date ${date} and murder poor ${kill}`);
+					message.channel.send(`${name} would marry ${marry} date ${date} and murder poor ${kill}`);
 					r_client.hincrby(`char_data_${team['char_' + raw_team[0]]['id']}`, 'wifed',  1);
 					r_client.hincrby(`char_data_${team['char_' + raw_team[1]]['id']}`, 'dated',  1);
 					r_client.hincrby(`char_data_${team['char_' + raw_team[2]]['id']}`, 'killed', 1);

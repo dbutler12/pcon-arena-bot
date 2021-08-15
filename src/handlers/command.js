@@ -8,7 +8,6 @@ const meta_h = require('./meta');
 const Units  = require('../units');
 const game_h = require('./game');
 
-
 async function tester(r_client, args){
 	const { promisify } = require('util');
 	const getAsync = promisify(r_client.hgetall).bind(r_client);
