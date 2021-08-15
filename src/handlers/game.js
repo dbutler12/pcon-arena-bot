@@ -38,22 +38,21 @@ function testSubmitMFK(r_client, d_client, message, team){
 		return response.author.id === message.author.id && response.content.charAt(0) === '!';
 		// return item.answers.some(answer => answer.toLowerCase() === response.content.toLowerCase());
 	};
-	const collector = message.channel.createMessageCollector({ filter, time: 50000 });
+	const collector = message.channel.createMessageCollector(filter, { time: 50000 });
 
 	collector.on('collect', async m => {
-		console.log(`Collected ${m.content}`);
     let raw_team = "";
-  	//message = m.first();
+    
 		const raw_message = m.content
 		.trim()
-		.substring(global.prefix.length)
+		.substring(global.prefix.length);
 		
 		raw_team = raw_message.split(/\s+/);
 		
 		if(raw_team[0] in global.commands) return; // End session
 		
 		for(let i in raw_team){
-			raw_team[i] = emoji_h.extractCharStr(raw_team[i]);
+			raw_team[i] = await emoji_h.extractCharStr(raw_team[i]);
 		}
 		
 		let validate = await redis_h.charsToTeam(r_client, message, raw_team);
@@ -79,85 +78,9 @@ function testSubmitMFK(r_client, d_client, message, team){
 	});
 
 	collector.on('end', collected => {
-		console.log(`End Collected ${collected.size} items:`);
-		console.log(collected);
+		console.log(`End Collected ${collected.size} items.`);
 	});
 }
-
-/*
-let units_strs = team.unitsEmo(d_client);
-	let user = m => m.author.id === message.author.id;
-  message.channel.send(`Marry Date Kill:\n${units_strs[0]}\n${units_strs[1]}`).then(() => {
-    message.channel.awaitMessages(user, {
-        max: 1,
-        time: 50000,
-        errors: ['time']
-      })
-      .then(async function(message){
-      	const PREFIX = "!";
-      	let raw_team = "";
-      	message = message.first();
-      	if(message.content.startsWith(PREFIX)){
-		  		const raw_message = message.content
-		  		.trim()
-		  		.substring(PREFIX.length)
-		  		
-		  		raw_team = raw_message.split(/\s+/);
-		  		
-		  		if(raw_team[0] in global.commands) return; // End session
-		  		
-					for(let i in raw_team){
-						raw_team[i] = emoji_h.extractCharStr(raw_team[i]);
-					}
-				}else{
-					return;
-				}		
-				
-				let validate = await redis_h.charsToTeam(r_client, message, raw_team);
-
-				if(raw_team.length === 3 && team.compareTeam(validate) === 3) {
-					let name = message.author.username;
-					let tag  = message.author.tag;
-					let marry = emoji_h.getEmojiString(d_client,raw_team[0]);
-					let date  = emoji_h.getEmojiString(d_client,raw_team[1]);
-					let kill  = emoji_h.getEmojiString(d_client,raw_team[2]);
-					
-					message.channel.send(`${name} would marry ${marry} date ${date} and murder poor ${kill}`);
-					r_client.hincrby(`char_data_${team['char_' + raw_team[0]]['id']}`, 'wifed',  1);
-					r_client.hincrby(`char_data_${team['char_' + raw_team[1]]['id']}`, 'dated',  1);
-					r_client.hincrby(`char_data_${team['char_' + raw_team[2]]['id']}`, 'killed', 1);
-					r_client.hincrby(`${tag}_wifed`, raw_team[0],1);
-					r_client.hincrby(`${tag}_dated`, raw_team[1],1);
-					r_client.hincrby(`${tag}_killed`,raw_team[2],1);
-				}else{
-					//TODO: Consider not having a return message here, or something more generic
-					message.channel.send("Entered wrong units.");
-				}
-      })
-      .catch(collected => {
-      	if(collected.length > 0){
-		    	console.log("submitMFK Collected:");
-		      console.log(collected);
-		    }
-      });
-  })
-  */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 async function mfk(r_client, d_client, message){
@@ -240,14 +163,14 @@ function submitMFK(r_client, d_client, message, team){
       	if(message.content.startsWith(PREFIX)){
 		  		const raw_message = message.content
 		  		.trim()
-		  		.substring(PREFIX.length)
+		  		.substring(PREFIX.length);
 		  		
 		  		raw_team = raw_message.split(/\s+/);
 		  		
 		  		if(raw_team[0] in global.commands) return; // End session
 		  		
 					for(let i in raw_team){
-						raw_team[i] = emoji_h.extractCharStr(raw_team[i]);
+						raw_team[i] = await emoji_h.extractCharStr(raw_team[i]);
 					}
 				}else{
 					return;
