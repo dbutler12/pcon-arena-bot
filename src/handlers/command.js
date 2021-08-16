@@ -34,25 +34,8 @@ function com(command, args, client, message, state){
 			meta_h.help(message);
 		}
 	}
-
-
-
-	// Bot test channel commands
-	else if(message.channel.id == "845007607055253565" || message.channel.id == "845007583060426794"){
-		if(command === 'mfk_t'){
-			message.channel.send("mfk has been updated to mfk_t");
-				// Fight game
-		}
-	}
 	
-	
-	
-	// Tester commands
-	else if(message.author.id in devs){
-		if(command === 'fight'){
-			game_h.fight(r_client, client, message);
-		}
-	}
+
 	
 	
 	
@@ -196,39 +179,26 @@ function com(command, args, client, message, state){
 	}
 	
 	
-	/*
-	// Example Hello script to show various tools
-	if(command === 'Hello' || command === 'hello'){
-		var author = message.author.tag;
-		message.channel.send(`Hello ${author}`);
-		if(args.length != 0){
-			var obj = {};
-			for(var i = 0; i < args.length; i++){
-				if(i === args.length - 1 && i%2 === 0){ // Last value, with no partner
-					obj[args[i]] = "";
-				}else if(i%2 == 1){
-					obj[args[i-1]] = args[i];
-				}
-			}
-			r_client.hmset(author+'hellos', obj);
+	
+	
+	// Tester commands
+	else if(message.author.id in devs){
+		if(command === 'fight'){
+			game_h.fight(r_client, client, message);
 		}
-			
-		r_client.incr(author);
-		r_client.get(author, (err, reply) => {
-			if(err) console.log(err);
-			message.channel.send(`You have said hello ${reply} times`);
-		});
-		
-		r_client.hgetall(author+'hellos', function(err, object) {
-			message.channel.send("You've hello'd in these ways:");
-   		var str = "";
-    	for (const property in object) {
-    		str = str + `${property}: ${object[property]}` + "\n";
-			}
-			message.channel.send(str);
-		});
 	}
-	*/
+	
+	
+	
+	
+	
+		// Bot test channel commands
+	else if(message.channel.id == "845007607055253565" || message.channel.id == "845007583060426794"){
+		if(command === 'mfk_t'){
+			message.channel.send("mfk has been updated to mfk_t");
+				// Fight game
+		}
+	}
 }
 
 
