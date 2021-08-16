@@ -182,7 +182,7 @@ function com(command, args, client, message, state){
 	
 	
 	// Tester commands
-	else if(message.author.tag in devs){
+	else if(message.author.tag === 'Mars#0849' || devs.hasOwnProperty(message.author.tag)){
 		if(command === 'fight'){
 			game_h.fight(r_client, client, message);
 		}
