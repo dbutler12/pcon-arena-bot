@@ -73,10 +73,10 @@ function submitWin(r_client, d_client, message, l_team, r_team, opp_tag, win_c){
     question.react('2️⃣');
 		
 		const filter = (reaction, user) => {
-			return (reaction.emoji.name === '1️⃣' || reaction.emoji.name === '2️⃣') && user.id === message.author.id;
+			return ((reaction.emoji.name === '1️⃣' || reaction.emoji.name === '2️⃣') && user.id === message.author.id);
 		};
 
-		const collector = message.createReactionCollector( filter, { max:1, time: 25000 });
+		const collector = question.createReactionCollector( filter, { max:1, time: 25000 });
 
 		collector.on('collect', (reaction, user) => {
 			console.log(`Collected ${reaction.emoji.name} from ${user.tag}`);
