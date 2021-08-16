@@ -12,7 +12,7 @@ async function generateRandomTeam(r_client, num){
 	let id_arr = [];
 	for(let i = 0; i < num; i++){
 		id_arr[i] = Math.floor(Math.random()*char_id);
-		for(let j = 0; j < id_arr.length; j++){
+		for(let j = 0; j < i; j++){
 			if(id_arr[i] == id_arr[j]){
 				i--;
 				break;
