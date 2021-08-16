@@ -109,25 +109,23 @@ async function love(r_client, d_client, message, usertag, args, choice = false){
 	
 	let count = 0;
 	let len = Object.keys(wifed).length;
-	if(choice == false || choice == 'wifed'){
+	if(choice === false || choice === 'wifed'){
 		let m_str = title + " Wifed__**\n";
 		m_str = printLove(d_client, wifed, m_str);
 		await message.channel.send(m_str);
 	}
 
-	if(choice == false || choice == 'dated'){
+	if(choice === false || choice === 'dated'){
 		let m_str = title + " Dated__**\n";
 		m_str = printLove(d_client, dated, m_str);
 		await message.channel.send(m_str);
 	}
 	
-	if(choice == false || choice == 'killed'){
+	if(choice === false || choice === 'killed'){
 		let m_str = title + " Killed__**\n";
 		m_str = printLove(d_client, killed, m_str);
 		await message.channel.send(m_str);
 	}
-
-	message.channel.send(m_str);
 }
 
 
