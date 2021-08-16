@@ -21,7 +21,7 @@ function createIDArray(chars, nick){
 	return {error, id_arr};
 }
 
-// Returns a Team object comprised of the characters given in the 'chars' array
+// Returns a Promise for a Team object comprised of the characters given in the 'chars' array
 // chars is an array of strings
 async function charsToTeam(r_client, message, chars){
 		const { promisify } = require('util');

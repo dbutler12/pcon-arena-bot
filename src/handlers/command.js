@@ -35,11 +35,18 @@ function com(command, args, client, message, state){
 		}
 	}
 	
+	// Dev testing commands
+	else if(command in global.dev_commands && message.author.id in devs){
+		// Bot test channel commands
+		if(message.channel.id == "845007607055253565" || message.channel.id == "845007583060426794"){
+			if(command === 'fight'){
+				game_h.fight(r_client, client, message);
+			}
+		}
+	}
+	
 
-	
-	
-	
-	
+
 	// Admin specific testing
 	else if(message.author.tag === 'Fengtorin#5328'){
 		if(command === 'restart'){
@@ -84,8 +91,6 @@ function com(command, args, client, message, state){
 			}else{ // Wrong party size
 				message.channel.send("Enemy party needs 5 members.");
 			}
-		
-		
 		
 		
 		// Test functions
@@ -175,28 +180,6 @@ function com(command, args, client, message, state){
             }*/
           });
         });
-		}
-	}
-	
-	
-	
-	
-	// Tester commands
-	else if(message.author.id in devs){
-		if(command === 'fight'){
-			game_h.fight(r_client, client, message);
-		}
-	}
-	
-	
-	
-	
-	
-		// Bot test channel commands
-	else if(message.channel.id == "845007607055253565" || message.channel.id == "845007583060426794"){
-		if(command === 'mfk_t'){
-			message.channel.send("mfk has been updated to mfk_t");
-				// Fight game
 		}
 	}
 }

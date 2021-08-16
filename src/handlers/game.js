@@ -55,8 +55,8 @@ async function resolveFight(r_client, d_client, message){
 		left = t_arr[1];
 		right = t_arr[0];
 	}
-	left  = new Units.Team(left.split('_'), 5);
-	right = new Units.Team(right.split('_'), 5);
+	left  = redis_h.charsToTeam(r_client, message, left);
+	right = redis_h.charsToTeam(r_client, message, right);
 	submitWin(r_client, d_client, message, left, right, keys[rand], win_c);
 }
 

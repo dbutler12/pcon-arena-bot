@@ -25,6 +25,11 @@ global.com_call = {
 	version: "!version"
 }
 
+global.dev_commands = {
+	fight: "!fight",
+	arena: "!arena"
+}
+
 global.prefix = '!';
 
 client.once('ready', () => {
