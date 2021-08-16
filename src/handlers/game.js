@@ -101,9 +101,9 @@ async function love(r_client, d_client, message, usertag, args, choice = false){
 	const { promisify } = require('util');
 	const getAsync = promisify(r_client.hgetall).bind(r_client);
 	
-	let wifed  = (choice == false || choice == 'wifed')  ? await getAsync(`${usertag}_wifed`)  | false;
-	let dated  = (choice == false || choice == 'dated')  ? await getAsync(`${usertag}_dated`)  | false;
-	let killed = (choice == false || choice == 'killed') ? await getAsync(`${usertag}_killed`) | false;
+	let wifed  = (choice == false || choice == 'wifed')  ? await getAsync(`${usertag}_wifed`)  : false;
+	let dated  = (choice == false || choice == 'dated')  ? await getAsync(`${usertag}_dated`)  : false;
+	let killed = (choice == false || choice == 'killed') ? await getAsync(`${usertag}_killed`) : false;
 	
 	let title = `**__${message.author.username}`;
 	
