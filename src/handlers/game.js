@@ -33,7 +33,7 @@ async function resolveFight(r_client, d_client, message){
 	let teams = await hashAsync('ba_teams');
 	let keys  = Object.keys(teams);
 	
-	let h_len = teams.length;
+	let h_len = keys.length;
 	if(h_len === 1) return message.channel.send("No teams exist to resolve.");
 	
 	let rand  = Math.floor(Math.random()*(h_len-1));
