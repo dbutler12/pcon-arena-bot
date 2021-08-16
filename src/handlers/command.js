@@ -8,38 +8,57 @@ const meta_h = require('./meta');
 const Units  = require('../units');
 const game_h = require('./game');
 
+const devs = {
+	'116696809430188032':'tester',
+	'331952683579867136':'admin'
+}
 
 function com(command, args, client, message, state){
-	// Development commands
-	if(message.channel.id == "845007607055253565" || message.channel.id == "845007583060426794"){
+	// Live commands
+	if(command in global.commands){
+		if(command === 'mfk' || command === 'mdk'){
+			game_h.mfk(r_client, client, message);
+		}else if(command === 'wifed'){
+			game_h.love(r_client, client, message, message.author.tag, 'wifed');
+		}else if(command === 'dated'){
+			game_h.love(r_client, client, message, message.author.tag, 'dated');
+		}else if(command === 'killed'){
+			game_h.love(r_client, client, message, message.author.tag, 'killed');
+		}else if(command === 'love-love'){
+			game_h.love(r_client, client, message, message.author.tag);
+		}else if(command === 'char'){
+			meta_h.viewChar(r_client, client, message, args);
+		}else if(command === 'version'){
+			meta_h.getVer(r_client, message);
+		}else if(command === 'help'){
+			meta_h.help(message);
+		}
+	}
+
+
+
+	// Bot test channel commands
+	else if(message.channel.id == "845007607055253565" || message.channel.id == "845007583060426794"){
 		if(command === 'mfk_t'){
 			message.channel.send("mfk has been updated to mfk_t");
+				// Fight game
 		}
 	}
 	
 	
-	// Live commands
-	if(command === 'mfk' || command === 'mdk'){
-		game_h.mfk(r_client, client, message);
-	}else if(command === 'wifed'){
-		game_h.love(r_client, client, message, message.author.tag, 'wifed');
-	}else if(command === 'dated'){
-		game_h.love(r_client, client, message, message.author.tag, 'dated');
-	}else if(command === 'killed'){
-		game_h.love(r_client, client, message, message.author.tag, 'killed');
-	}else if(command === 'love-love'){
-		game_h.love(r_client, client, message, message.author.tag);
-	}else if(command === 'char'){
-		meta_h.viewChar(r_client, client, message, args);
-	}else if(command === 'version'){
-		meta_h.getVer(r_client, message);
-	}else if(command === 'help'){
-		meta_h.help(message);
+	
+	// Tester commands
+	else if(message.author.id in devs){
+		if(command === 'fight'){
+			game_h.fight(r_client, client, message);
+		}
 	}
 	
 	
+	
+	
 	// Admin specific testing
-	if(message.author.tag === 'Fengtorin#5328'){
+	else if(message.author.tag === 'Fengtorin#5328'){
 		if(command === 'restart'){
 			console.log(`${message.author.tag} is requesting restart from task-bot`);
 			const channel01 = client.channels.cache.find(channel => channel.id === '833833221077860372');
@@ -67,12 +86,9 @@ function com(command, args, client, message, state){
 		}else if(command === 'update-version'){
 			meta_h.updateVer(r_client, args[0]);
 		
-		
-		
-		
-		// Fight game
-		}else if(command === 'fight'){
-			game_h.fight(r_client, client, message);
+
+		}else if(command === 'arena'){
+			game_h.resolveFight(r_client, d_client, message);
 		
 		
 		

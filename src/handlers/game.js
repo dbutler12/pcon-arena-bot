@@ -25,6 +25,70 @@ async function generateRandomTeam(r_client, num){
 }
 
 
+async function resolveFight(r_client, d_client, message){
+	const { promisify } = require('util');
+	const hashAsync = promisify(r_client.hgetall).bind(r_client);
+	
+	let tag   = message.author.tag;
+	let teams = await hashAsync('ba_teams');
+	let keys  = Object.keys(teams);
+	
+	let h_len = teams.length;
+	if(h_len === 1) return message.channel.send("No teams exist to resolve.");
+	let rand  = Math.floor(Math.random()*(h_len-1));
+	let rand2 = Math.floor(Math.random()*(h_len-1));
+	if(rand == rand2){
+		if(rand2 == h_len-1){ rand2-- }
+		else{ rand2++ }
+	}
+	
+	if(keys[rand] == tag) rand = rand2;
+	
+	let t_arr = teams[keys[rand]].split('-');
+	let left  = t_arr[0];
+	let right = t_arr[1];
+	let win_c = 1; // win condition
+	
+	if(rand >= rand2){
+		win = 0;
+		left = t_arr[1];
+		right = t_arr[0];
+	}
+	left  = new Units.Team(left.split('_'), 5);
+	right = new Units.Team(right.split('_'), 5);
+	submitWin(r_client, d_client, message, left, right, keys[rand], win_c);
+}
+
+
+function submitWin(r_client, d_client, message, l_team, r_team, opp_tag, win_c){
+	let l_strs = l_team.unitsEmo(d_client);
+	let r_strs = r_team.unitsEmo(d_client);
+	//1️⃣2️⃣
+	message.channel.send('Which team wins?\n' +
+	`1️⃣ ${l_strs[0]}  **__VS__**  ${r_strs[0]} 2️⃣\n` +
+	`(${l_strs[1]})  **__VS__**  (${r_strs[1]})\n`).then((question) => {
+    // Have our bot guide the user by reacting with the correct reactions
+    question.react('1️⃣');
+    question.react('2️⃣');
+		
+		const filter = (reaction, user) => {
+			return (reaction.emoji.name === '1️⃣' || reaction.emoji.name === '2️⃣') && user.id === message.author.id;
+		};
+
+		const collector = message.createReactionCollector( filter, { max:1, time: 25000 });
+
+		collector.on('collect', (reaction, user) => {
+			console.log(`Collected ${reaction.emoji.name} from ${user.tag}`);
+		});
+
+		collector.on('end', collected => {
+			console.log(`Collected ${collected.size} items`);
+		});
+	}
+
+}
+
+
 async function fight(r_client, d_client, message){
 	let team = await generateRandomTeam(r_client,5);
 	submitFight(r_client, d_client, message, team);
@@ -256,4 +320,4 @@ function submitMFK(r_client, d_client, message, team){
 }
 */
 
-module.exports = { mfk, love, fight };
+module.exports = { mfk, love, fight, resolveFight };

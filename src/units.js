@@ -62,14 +62,20 @@ function Team(data, num, team2 = null, team3 = null){
 		return this.units.map(u => u.name).join('_');
 	}
 	
-	this.unitsEmo = function(d_client){
+	this.unitsEmo = function(d_client, reverse = false){
 		let emo_str = "";
 		let uni_str = "";
+		
 		for(let u in this.units){
 			let emo = d_client.emojis.cache.find(emoji => emoji.name === this.units[u].name);
 			if(emo == undefined) emo = this.units[u].name;
-			emo_str = emo_str + emo.toString() + " ";
-			uni_str = uni_str + this.units[u].name + " ";
+			if(!reverse){
+				emo_str = emo_str + emo.toString() + " ";
+				uni_str = uni_str + this.units[u].name + " ";
+			}else{
+				emo_str = emo.toString() + " " + emo_str
+				uni_str = this.units[u].name + " " + uni_str;
+			}
 		}
 		return [emo_str, uni_str];
 	}
