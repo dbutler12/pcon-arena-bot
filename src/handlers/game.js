@@ -51,7 +51,7 @@ async function resolveFight(r_client, d_client, message){
 	let win_c = 2; // win condition
 	
 	if(rand >= rand2){
-		win = 1;
+		win_c = 1;
 		left = t_arr[1];
 		right = t_arr[0];
 	}
@@ -96,7 +96,7 @@ function submitWin(r_client, d_client, message, l_team, r_team, opp_tag, win_c){
 					r_client.hmset('ba_teams', obj);
 					console.log("Added " + result + " to ba_teams");
 				}
-			}
+			});
 		});
 
 		collector.on('end', collected => {
