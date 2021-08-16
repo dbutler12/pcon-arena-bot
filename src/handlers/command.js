@@ -41,6 +41,8 @@ function com(command, args, client, message, state){
 		if(message.channel.id == "845007607055253565" || message.channel.id == "845007583060426794"){
 			if(command === 'fight'){
 				game_h.fight(r_client, client, message);
+			}else if(command === 'arena'){
+				game_h.resolveFight(r_client, client, message);
 			}
 		}
 	}
@@ -75,11 +77,6 @@ function com(command, args, client, message, state){
 			meta_h.addNick(r_client, message, args[0], args[1]);
 		}else if(command === 'update-version'){
 			meta_h.updateVer(r_client, args[0]);
-		
-
-		}else if(command === 'arena'){
-			game_h.resolveFight(r_client, client, message);
-		
 		
 		
 		
