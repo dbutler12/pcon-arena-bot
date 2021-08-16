@@ -9,8 +9,8 @@ const Units  = require('../units');
 const game_h = require('./game');
 
 const devs = {
-	'Mars#0849':'tester',
-	'Fengtorin#5328':'admin'
+	'116696809430188032':'tester',
+	'331952683579867136':'admin'
 }
 
 function com(command, args, client, message, state){
@@ -78,7 +78,7 @@ function com(command, args, client, message, state){
 		
 		
 		// Original arena fight command
-		}else if(command === 'arena' || command === 'f'){
+		}else if(command === 'old-arena' || command === 'f'){
 			if(args.length === 5){ // Full party
 				bat_h.battle(r_client, message, args);
 			}else{ // Wrong party size
@@ -182,7 +182,7 @@ function com(command, args, client, message, state){
 	
 	
 	// Tester commands
-	else if(message.author.tag === 'Mars#0849' || devs.hasOwnProperty(message.author.tag)){
+	else if(message.author.id in devs){
 		if(command === 'fight'){
 			game_h.fight(r_client, client, message);
 		}
