@@ -3,30 +3,92 @@ const redis_h  = require('./redis-methods');
 const emoji_h  = require('../emojis');
 
 
-
-async function mfk(r_client, d_client, message){
+async function generateRandomTeam(r_client, num){
 	const { promisify } = require('util');
 	const getAsync = promisify(r_client.get).bind(r_client);
 	let char_id = await getAsync('cur_char_id');
 	char_id = parseInt(char_id)-1;
 	
 	let id_arr = [];
-	id_arr[0] = Math.floor(Math.random()*char_id);
-	id_arr[1] = Math.floor(Math.random()*char_id);
-	id_arr[2] = Math.floor(Math.random()*char_id);
-	
-	let lockout = 0;
-	while((id_arr[0] === id_arr[1] || id_arr[0] === id_arr[2] || id_arr[1] === id_arr[2]) && lockout < 10){
-		id_arr[0] = Math.floor(Math.random()*char_id);
-		id_arr[1] = Math.floor(Math.random()*char_id);
-		id_arr[2] = Math.floor(Math.random()*char_id);
-		lockout++;
+	for(let i = 0; i < num; i++){
+		id_arr[i] = Math.floor(Math.random()*char_id);
+		for(let j = 0; j < id_arr.length; j++){
+			if(id_arr[i] == id_arr[j]){
+				i--;
+				break;
+			}
+		}
 	}
 	
-	if(lockout > 9) return message.channel.send("Failed to randomize.");
-	
 	let team = await redis_h.idToTeam(r_client, id_arr);
+	return team;
+}
+
+
+async function fight(r_client, client, message){
+	let team = await generateRandomTeam(r_client,5);
+	submitFight(r_client, d_client, message, team);
+}
+
+
+
+async function mfk(r_client, d_client, message){
+	let team = await generateRandomTeam(r_client,3);
 	submitMFK(r_client, d_client, message, team);
+}
+
+function submitFight(r_client, d_client, message, team){
+	let units_strs = team.unitsEmo(d_client);
+	message.channel.send(`Create a team that beats this:\n${units_strs[0]}\n${units_strs[1]}`);
+
+	const filter = response => {
+		return response.author.id === message.author.id && response.content.charAt(0) === '!';
+	};
+	
+	const collector = message.channel.createMessageCollector(filter, { max: 1, time: 50000, errors: ['time'] });
+	collector.on('collect', async m => {
+    let raw_team = "";
+    
+		const raw_message = m.content
+		.trim()
+		.substring(global.prefix.length);
+		
+		raw_team = raw_message.split(/\s+/);
+		
+		if(raw_team[0] in global.commands) return; // End session
+		
+		for(let i in raw_team){
+			raw_team[i] = await emoji_h.extractCharStr(raw_team[i]);
+		}
+
+		if(raw_team.length === 5) {
+			let userTeam = await redis_h.charsToTeam(r_client, message, raw_team);
+			const { promisify } = require('util');
+			const existsAsync = promisify(r_client.hexists).bind(r_client);
+			let name = message.author.username;
+			let tag  = message.author.tag;
+			let tag_exists = await existsAsync('ba_teams', tag);
+			if(tag_exists != 1){
+				// Insert directly into tag
+				let team_obj = {};
+				team_obj[tag] = team.unitsStr();
+				r_client.hmset('ba_teams', team_obj);
+			}else{
+				// Add to character set
+				r_client.sadd(['ba_teams_' + tag, team.unitsStr()], function(err, reply) {
+					if(err){
+						console.log("ba_teams_" + tag +" err:" + err);
+					}
+				});
+			}
+		}else{
+			message.channel.send("Invalid number of units.");
+		}
+	});
+
+	collector.on('end', collected => {
+		//console.log(`End Collected ${collected.size} items.`);
+	});
 }
 
 
@@ -36,7 +98,6 @@ function submitMFK(r_client, d_client, message, team){
   
 	const filter = response => {
 		return response.author.id === message.author.id && response.content.charAt(0) === '!';
-		// return item.answers.some(answer => answer.toLowerCase() === response.content.toLowerCase());
 	};
 	const collector = message.channel.createMessageCollector(filter, { max: 1, time: 50000, errors: ['time'] });
 
@@ -195,4 +256,4 @@ function submitMFK(r_client, d_client, message, team){
 }
 */
 
-module.exports = { mfk, love };
+module.exports = { mfk, love, fight };

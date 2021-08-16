@@ -12,13 +12,7 @@ const game_h = require('./game');
 function com(command, args, client, message, state){
 	// Development commands
 	if(message.channel.id == "845007607055253565" || message.channel.id == "845007583060426794"){
-		if(command === 'fight' || command === 'f'){
-			if(args.length === 5){ // Full party
-				bat_h.battle(r_client, message, args);
-			}else{ // Wrong party size
-				message.channel.send("Enemy party needs 5 members.");
-			}
-		}else if(command === 'mfk_t'){
+		if(command === 'mfk_t'){
 			message.channel.send("mfk has been updated to mfk_t");
 		}
 	}
@@ -76,11 +70,21 @@ function com(command, args, client, message, state){
 		
 		
 		
+		// Fight game
+		}else if(command === 'fight'){
+			game_h.fight(r_client, client, message);
 		
 		
 		
 		
 		
+		// Original arena fight command
+		}else if(command === 'arena' || command === 'f'){
+			if(args.length === 5){ // Full party
+				bat_h.battle(r_client, message, args);
+			}else{ // Wrong party size
+				message.channel.send("Enemy party needs 5 members.");
+			}
 		
 		
 		

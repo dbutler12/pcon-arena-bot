@@ -5,6 +5,7 @@ require('dotenv').config();
 const com_h = require('./handlers/command');
 
 global.commands = {
+	fight: "!fight",
 	mfk: "!mfk or !mdk: Marry date kill game. Bot will list 3 characters that you can choose to marry, date, or kill.(Example: Jun Yukari Io)\nAfterwards, use ! and tell the bot in order of !Marry Date Kill the characters.(Example: !Io Jun Yukari)",
 	mdk: "Marry date kill game",
 	"love-love": "Lists personal stats for mdk game",
@@ -16,6 +17,7 @@ global.commands = {
 }
 
 global.com_call = {
+	fight: "!fight",
 	mfk: "!mfk or !mdk, then !name name name in order of !marry date kill",
 	"love-love": "!love-love",
 	wifed: "!wifed",

@@ -49,7 +49,7 @@ function addNick(r_client, message, c_name, n_name){
 		}
 		
 		let id = nick[char_str];
-		var nick_obj = {};
+		let nick_obj = {};
 		nick_obj[n_name] = id;
 		r_client.hmset('char_nick', nick_obj);
 	});
