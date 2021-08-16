@@ -48,10 +48,10 @@ async function resolveFight(r_client, d_client, message){
 	let t_arr = teams[keys[rand]].split('-');
 	let left  = t_arr[0];
 	let right = t_arr[1];
-	let win_c = 1; // win condition
+	let win_c = 2; // win condition
 	
 	if(rand >= rand2){
-		win = 0;
+		win = 1;
 		left = t_arr[1];
 		right = t_arr[0];
 	}
@@ -79,7 +79,24 @@ function submitWin(r_client, d_client, message, l_team, r_team, opp_tag, win_c){
 		const collector = question.createReactionCollector( filter, { max:1, time: 25000 });
 
 		collector.on('collect', (reaction, user) => {
-			console.log(`Collected ${reaction.emoji.name} from ${user.tag}`);
+			let react = reaction.emoji.name;
+			// Submitted response wins
+			if((react == '1️⃣' && win_c == 1) || (react == '2️⃣' && win_c == 2)){
+				message.channel.send(`${opp_tag} wins!`);
+			}else{ // Submitted response loses
+				message.channel.send(`${user.tag} wins!`);
+			}
+			r_client.spop('ba_teams_' + opp_tag, function(err, result){
+				if(result == undefined || result == null){
+					r_client.hdel('ba_teams', opp_tag);
+					console.log("Removed ba_teams: " + opp_tag);
+				}else{
+					let obj = {};
+					obj[opp_tag] = result;
+					r_client.hmset('ba_teams', obj);
+					console.log("Added " + result + " to ba_teams");
+				}
+			}
 		});
 
 		collector.on('end', collected => {
