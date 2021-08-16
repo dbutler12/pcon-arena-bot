@@ -71,11 +71,11 @@ function submitFight(r_client, d_client, message, team){
 			if(tag_exists != 1){
 				// Insert directly into tag
 				let team_obj = {};
-				team_obj[tag] = team.unitsStr();
+				team_obj[tag] = team.unitsStr() + "-" + userTeam.unitsStr();
 				r_client.hmset('ba_teams', team_obj);
 			}else{
 				// Add to character set
-				r_client.sadd(['ba_teams_' + tag, team.unitsStr()], function(err, reply) {
+				r_client.sadd(['ba_teams_' + tag, team.unitsStr() + "-" + userTeam.unitsStr()], function(err, reply) {
 					if(err){
 						console.log("ba_teams_" + tag +" err:" + err);
 					}
