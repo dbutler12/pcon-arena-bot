@@ -35,6 +35,7 @@ async function resolveFight(r_client, d_client, message){
 	
 	let h_len = teams.length;
 	if(h_len === 1) return message.channel.send("No teams exist to resolve.");
+	
 	let rand  = Math.floor(Math.random()*(h_len-1));
 	let rand2 = Math.floor(Math.random()*(h_len-1));
 	if(rand == rand2){
@@ -84,7 +85,7 @@ function submitWin(r_client, d_client, message, l_team, r_team, opp_tag, win_c){
 		collector.on('end', collected => {
 			console.log(`Collected ${collected.size} items`);
 		});
-	}
+	});
 
 }
 
