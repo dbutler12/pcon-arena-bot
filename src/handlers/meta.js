@@ -140,9 +140,9 @@ function updateChar(r_client, message, args){
 }
 
 
-function viewChar(r_client, d_client, message, args){
+async function viewChar(r_client, d_client, message, args){
 		r_client.hgetall('char_nick', function(err, nick) {
-			let char_str = emoji_h.extractCharStr(args[0]);
+			let char_str = await emoji_h.extractCharStr(args[0]);
 			if(!(char_str in nick)){
 				message.channel.send(`Char ${char_str} unknown.`);
 				return;
