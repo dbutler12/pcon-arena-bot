@@ -25,7 +25,7 @@ async function generateRandomTeam(r_client, num){
 }
 
 
-async function fight(r_client, client, message){
+async function fight(r_client, d_client, message){
 	let team = await generateRandomTeam(r_client,5);
 	submitFight(r_client, d_client, message, team);
 }
