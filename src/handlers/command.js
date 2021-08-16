@@ -71,7 +71,7 @@ function com(command, args, client, message, state){
 		
 
 		}else if(command === 'arena'){
-			game_h.resolveFight(r_client, d_client, message);
+			game_h.resolveFight(r_client, client, message);
 		
 		
 		
