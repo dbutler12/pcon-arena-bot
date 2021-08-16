@@ -97,7 +97,7 @@ function printLove(d_client, obj, love_str){
 	return love_str;
 }
 
-async function love(r_client, d_client, message, usertag, args, choice = false){
+async function love(r_client, d_client, message, usertag, choice = false){
 	const { promisify } = require('util');
 	const getAsync = promisify(r_client.hgetall).bind(r_client);
 	
