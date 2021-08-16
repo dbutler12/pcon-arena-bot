@@ -27,6 +27,12 @@ function com(command, args, client, message, state){
 	// Live commands
 	if(command === 'mfk' || command === 'mdk'){
 		game_h.mfk(r_client, client, message);
+	}else if(command === 'wifed'){
+		game_h.love(r_client, client, message, message.author.tag, 'wifed');
+	}else if(command === 'dated'){
+		game_h.love(r_client, client, message, message.author.tag, 'dated');
+	}else if(command === 'killed'){
+		game_h.love(r_client, client, message, message.author.tag, 'killed');
 	}else if(command === 'love-love'){
 		game_h.love(r_client, client, message, message.author.tag);
 	}else if(command === 'char'){

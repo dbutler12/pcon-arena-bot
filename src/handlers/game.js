@@ -97,26 +97,35 @@ function printLove(d_client, obj, love_str){
 	return love_str;
 }
 
-async function love(r_client, d_client, message, usertag, args){
+async function love(r_client, d_client, message, usertag, args, choice = false){
 	const { promisify } = require('util');
 	const getAsync = promisify(r_client.hgetall).bind(r_client);
 	
-	let wifed  = await getAsync(`${usertag}_wifed`);
-	let dated  = await getAsync(`${usertag}_dated`);
-	let killed = await getAsync(`${usertag}_killed`);
+	let wifed  = (choice == false || choice == 'wifed')  ? await getAsync(`${usertag}_wifed`)  | false;
+	let dated  = (choice == false || choice == 'dated')  ? await getAsync(`${usertag}_dated`)  | false;
+	let killed = (choice == false || choice == 'killed') ? await getAsync(`${usertag}_killed`) | false;
 	
-	let m_str = `**${message.author.username}**`;
+	let title = `**__${message.author.username}`;
 	
 	let count = 0;
 	let len = Object.keys(wifed).length;
-	m_str = m_str + "\n**__Wifed__**\n";
-	m_str = printLove(d_client, wifed, m_str);
-	
-	m_str = m_str +"\n**__Dated__**\n";
-	m_str = printLove(d_client, dated, m_str);
+	if(choice == false || choice == 'wifed'){
+		let m_str = title + " Wifed__**\n";
+		m_str = printLove(d_client, wifed, m_str);
+		await message.channel.send(m_str);
+	}
 
-	m_str = m_str + "\n**__Killed__**:\n";
-	m_str = printLove(d_client, killed, m_str);
+	if(choice == false || choice == 'dated'){
+		let m_str = title + " Dated__**\n";
+		m_str = printLove(d_client, dated, m_str);
+		await message.channel.send(m_str);
+	}
+	
+	if(choice == false || choice == 'killed'){
+		let m_str = title + " Killed__**\n";
+		m_str = printLove(d_client, killed, m_str);
+		await message.channel.send(m_str);
+	}
 
 	message.channel.send(m_str);
 }
