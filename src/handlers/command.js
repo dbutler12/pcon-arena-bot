@@ -34,6 +34,10 @@ function com(command, args, client, message, state){
 			meta_h.help(message);
 		}else if(command === 'level'){
 			meta_h.checkMyLevel(r_client, message);
+		}else if(command === 'fight'){
+			game_h.fight(r_client, client, message);
+		}else if(command === 'arena'){
+			game_h.resolveFight(r_client, client, message);
 		}
 	}
 	
@@ -41,11 +45,6 @@ function com(command, args, client, message, state){
 	else if(command in global.dev_commands && message.author.id in devs){
 		// Bot test channel commands
 		if(message.channel.id == "845007607055253565" || message.channel.id == "845007583060426794"){
-			if(command === 'fight'){
-				game_h.fight(r_client, client, message);
-			}else if(command === 'arena'){
-				game_h.resolveFight(r_client, client, message);
-			}
 		}
 	}
 	
