@@ -1,5 +1,25 @@
 const emoji_h = require('../emojis');
 
+async function addExp(r_client, tag, amount, user = false){
+	const { promisify } = require('util');
+	const getScore = promisify(r_client.zscore).bind(r_client);
+	let exp1 = await getScore(`user_exp`, tag);
+	r_client.zincrby(`user_exp`, amount,  tag);
+	let exp2 = await getScore(`user_exp`, tag);
+	
+	let username = (user == false) ? tag : user;
+	let level = checkLevel(exp2);
+	if(checkLevel(exp1) != level){
+		message.channel.send(`${username} has reached level ${level}!`); 
+	}
+}
+
+
+function checkLevel(score){
+	return Math.floor((-1.0/2.0 + 1.0/10.0*Math.sqrt(4.0*parseFloat(score) + 25.0)));
+}
+
+
 function updateVer(r_client, version){
 	r_client.multi().
 	get('cur_version').
@@ -54,6 +74,7 @@ function addNick(r_client, message, c_name, n_name){
 		r_client.hmset('char_nick', nick_obj);
 	});
 }
+
 
 async function updateAllChars(r_client, add_obj = false, del_arr = false){
 	//Promisify redis, since it doesn't directly support promises			

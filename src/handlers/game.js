@@ -1,30 +1,26 @@
 const Units    = require('../units');
 const redis_h  = require('./redis-methods');
 const emoji_h  = require('../emojis');
+const meta_h   = require('./meta');
 
 
-async function generateRandomTeam(r_client, num){
-	const { promisify } = require('util');
-	const getAsync = promisify(r_client.get).bind(r_client);
-	let char_id = await getAsync('cur_char_id');
-	char_id = parseInt(char_id)-1;
-	
-	let id_arr = [];
-	for(let i = 0; i < num; i++){
-		id_arr[i] = Math.floor(Math.random()*char_id);
-		for(let j = 0; j < i; j++){
-			if(id_arr[i] == id_arr[j]){
-				i--;
-				break;
-			}
-		}
-	}
-	
-	let team = await redis_h.idToTeam(r_client, id_arr);
-	return team;
+// Fight game begin
+async function fight(r_client, d_client, message){
+	let team = await Units.generateRandomTeam(r_client,5);
+	submitFight(r_client, d_client, message, team);
+	meta_h.addExp(r_client, message.author.tag, 10, message.author.username);
 }
 
 
+// Marry Date Kill game begin
+async function mfk(r_client, d_client, message){
+	let team = await Units.generateRandomTeam(r_client,3);
+	submitMFK(r_client, d_client, message, team);
+	meta_h.addExp(r_client, message.author.tag, 5, message.author.username);
+}
+
+
+// Arena game begin
 async function resolveFight(r_client, d_client, message){
 	const { promisify } = require('util');
 	const hashAsync = promisify(r_client.hgetall).bind(r_client);
@@ -57,6 +53,7 @@ async function resolveFight(r_client, d_client, message){
 	}
 
 	submitWin(r_client, d_client, message, left, right, keys[rand], win_c);
+	meta_h.addExp(r_client, message.author.tag, 15, message.author.username);
 }
 
 
@@ -84,6 +81,7 @@ async function submitWin(r_client, d_client, message, left, right, opp_tag, win_
 			// Submitted response wins
 			if((react == '1️⃣' && win_c == 1) || (react == '2️⃣' && win_c == 2)){
 				message.channel.send(`${opp_tag} wins!`);
+				meta_h.addExp(r_client, opp_tag, 5);
 			}else{ // Submitted response loses
 				message.channel.send(`${user.tag} wins!`);
 			}
@@ -117,18 +115,6 @@ async function submitWin(r_client, d_client, message, left, right, opp_tag, win_
 
 }
 
-
-async function fight(r_client, d_client, message){
-	let team = await generateRandomTeam(r_client,5);
-	submitFight(r_client, d_client, message, team);
-}
-
-
-
-async function mfk(r_client, d_client, message){
-	let team = await generateRandomTeam(r_client,3);
-	submitMFK(r_client, d_client, message, team);
-}
 
 function submitFight(r_client, d_client, message, team){
 	let units_strs = team.unitsEmo(d_client);
@@ -227,11 +213,6 @@ function submitMFK(r_client, d_client, message, team){
 			r_client.hincrby(`char_data_${team['char_' + raw_team[0]]['id']}`, 'wifed',  1);
 			r_client.hincrby(`char_data_${team['char_' + raw_team[1]]['id']}`, 'dated',  1);
 			r_client.hincrby(`char_data_${team['char_' + raw_team[2]]['id']}`, 'killed', 1);
-			/*
-			r_client.hincrby(`${tag}_wifed`, raw_team[0],1);
-			r_client.hincrby(`${tag}_dated`, raw_team[1],1);
-			r_client.hincrby(`${tag}_killed`,raw_team[2],1);
-			*/
 		}else{
 			//TODO: Consider not having a return message here, or something more generic
 			message.channel.send("Entered wrong units.");
@@ -247,13 +228,16 @@ function submitMFK(r_client, d_client, message, team){
 function printLove(d_client, arr, love_str){
 	let len = arr.length;
 	let count = 0;
+	let spacing = "     ";
+	let space = spacing;
 	for(let i = 0; i < len; i++){
 		if(i%2 == 0){
 			let chara = emoji_h.getEmojiString(d_client, arr[i]);
 			love_str = love_str + `${chara}: **${arr[i+1]}**`
+			space = spacing.slice(arr[i+1].length);
 			count++;
 		}
-		if(count%5 != 1) love_str = love_str + "     ";
+		if(count%5 != 1) love_str = love_str + space;
 		if(count%5 == 1) love_str = love_str + "\n";
 	}
 	if((count-1)%5 != 1) love_str = love_str + "\n";
@@ -268,100 +252,7 @@ async function love(r_client, d_client, message, usertag, choice = false){
 	let loves = await getAsync(`love_${usertag}`, 0, -1, "withscores");
 	m_str = printLove(d_client, loves, m_str);
 	message.channel.send(m_str);
-	/*
-	let wifed  = (choice == false || choice == 'wifed')  ? await getAsync(`${usertag}_wifed`)  : false;
-	let dated  = (choice == false || choice == 'dated')  ? await getAsync(`${usertag}_dated`)  : false;
-	let killed = (choice == false || choice == 'killed') ? await getAsync(`${usertag}_killed`) : false;
-	
-	let title = `**__${message.author.username}`;
-	
-	let count = 0;
-	let len = Object.keys(wifed).length;
-	if(choice === false || choice === 'wifed'){
-		let m_str = title + " Wifed__**\n";
-		m_str = printLove(d_client, wifed, m_str);
-		await message.channel.send(m_str);
-	}
-
-	if(choice === false || choice === 'dated'){
-		let m_str = title + " Dated__**\n";
-		m_str = printLove(d_client, dated, m_str);
-		await message.channel.send(m_str);
-	}
-	
-	if(choice === false || choice === 'killed'){
-		let m_str = title + " Killed__**\n";
-		m_str = printLove(d_client, killed, m_str);
-		await message.channel.send(m_str);
-	}
-	*/
 }
 
-
-
-/*
- * Original mfk submission function, saved for reference
- * TODO: Remove this comment and the code later
- *
- *
-function submitMFK(r_client, d_client, message, team){
-	let units_strs = team.unitsEmo(d_client);
-	let user = m => m.author.id === message.author.id;
-  message.channel.send(`Marry Date Kill:\n${units_strs[0]}\n${units_strs[1]}`).then(() => {
-    message.channel.awaitMessages(user, {
-        max: 1,
-        time: 50000,
-        errors: ['time']
-      })
-      .then(async function(message){
-      	const PREFIX = global.prefix;
-      	let raw_team = "";
-      	message = message.first();
-      	if(message.content.startsWith(PREFIX)){
-		  		const raw_message = message.content
-		  		.trim()
-		  		.substring(PREFIX.length);
-		  		
-		  		raw_team = raw_message.split(/\s+/);
-		  		
-		  		if(raw_team[0] in global.commands) return; // End session
-		  		
-					for(let i in raw_team){
-						raw_team[i] = await emoji_h.extractCharStr(raw_team[i]);
-					}
-				}else{
-					return;
-				}		
-				
-				let validate = await redis_h.charsToTeam(r_client, message, raw_team);
-
-				if(raw_team.length === 3 && team.compareTeam(validate) === 3) {
-					let name = message.author.username;
-					let tag  = message.author.tag;
-					let marry = emoji_h.getEmojiString(d_client,raw_team[0]);
-					let date  = emoji_h.getEmojiString(d_client,raw_team[1]);
-					let kill  = emoji_h.getEmojiString(d_client,raw_team[2]);
-					
-					message.channel.send(`${name} would marry ${marry} date ${date} and murder poor ${kill}`);
-					r_client.hincrby(`char_data_${team['char_' + raw_team[0]]['id']}`, 'wifed',  1);
-					r_client.hincrby(`char_data_${team['char_' + raw_team[1]]['id']}`, 'dated',  1);
-					r_client.hincrby(`char_data_${team['char_' + raw_team[2]]['id']}`, 'killed', 1);
-					r_client.hincrby(`${tag}_wifed`, raw_team[0],1);
-					r_client.hincrby(`${tag}_dated`, raw_team[1],1);
-					r_client.hincrby(`${tag}_killed`,raw_team[2],1);
-				}else{
-					//TODO: Consider not having a return message here, or something more generic
-					message.channel.send("Entered wrong units.");
-				}
-      })
-      .catch(collected => {
-      	if(collected.length > 0){
-		    	console.log("submitMFK Collected:");
-		      console.log(collected);
-		    }
-      });
-  })
-}
-*/
 
 module.exports = { mfk, love, fight, resolveFight };
