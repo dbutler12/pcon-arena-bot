@@ -80,7 +80,7 @@ async function submitWin(r_client, d_client, message, left, right, opp_tag, win_
 				message.channel.send(`${opp_tag} wins!`);
 				meta_h.addExp(r_client, message, opp_tag, 5);
 			}else{ // Submitted response loses
-				message.channel.send(`${user.tag} wins!`);
+				message.channel.send(`Computer wins!`);
 			}
 			let win  = left;
 			let lose = right;
