@@ -79,4 +79,4 @@ async function idToTeam(r_client, id_arr){
 		return new Units.Team(results, results.length);
 }
 
-module.exports = { createIDArray, charsToTeam, idToTeam };
+module.exports = { createIDArray, charsToTeam, idToTeam, generateRandomTeam };
