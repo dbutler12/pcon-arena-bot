@@ -60,7 +60,7 @@ async function resolveFight(r_client, d_client, message){
 }
 
 
-function submitWin(r_client, d_client, message, left, right, opp_tag, win_c){
+async function submitWin(r_client, d_client, message, left, right, opp_tag, win_c){
 	let l_team = await redis_h.charsToTeam(r_client, message, left.split('_'));
 	let r_team = await redis_h.charsToTeam(r_client, message, right.split('_'));
 	let l_strs = l_team.unitsEmo(d_client);
