@@ -94,7 +94,8 @@ function com(command, args, client, message, state){
 				message.channel.send("Enemy party needs 5 members.");
 			}
 		
-		
+		}else if(command === 'challenge'){
+			game_h.challenge(r_client, client, message, args[0]);
 		// Test functions
 		}else if(command === 'add-sort'){
 			r_client.zadd('lifetime', 100*Math.random(), args[0]);

@@ -4,6 +4,12 @@ const emoji_h  = require('../emojis');
 const meta_h   = require('./meta');
 
 
+async function challenge(r_client, d_client, message, args){
+	let user = await message.channel.guild.members.fetch({cache : false}).then(members=>members.find(member=>member.user.tag === args[0]));
+	console.log(user);
+}
+
+
 // Fight game begin
 async function fight(r_client, d_client, message){
 	let team = await redis_h.generateRandomTeam(r_client,5);
@@ -18,6 +24,37 @@ async function mfk(r_client, d_client, message){
 }
 
 
+function generateRand(upTo, val1 = false, val2 = false){
+	if((!val1 && !val2) || upTo == 1) return Math.floor(Math.random()*upTo);
+	let count = 0;
+	let val = Math.floor(Math.random()*upTo);
+	
+	while((val == val1 || val == val2) && count < 25) {
+		val = Math.floor(Math.random()*upTo);
+		count++;
+	}
+	return val;
+}
+
+function getFight(keys, tag, rand){
+	let key = keys[rand];
+	let people = key.split('_');
+	if(people[0] == tag || (people.length == 2 && people[1] == tag)){
+		key = false;
+		let temp_key;
+		for(let i = 0; i < keys.length; i++){
+			temp_key = keys[i];
+			people = temp_key.split('_');
+			if(people[0] != tag){
+				if(people.length == 2 && people[1] == tag) continue;
+				key = temp_key;
+				break;
+			}
+		}
+	}
+	return key;
+}
+
 // Arena game begin
 async function resolveFight(r_client, d_client, message){
 	const { promisify } = require('util');
@@ -30,31 +67,34 @@ async function resolveFight(r_client, d_client, message){
 	let h_len = keys.length;
 	if(h_len === 1) return message.channel.send("No teams exist to resolve.");
 	
-	let rand  = Math.floor(Math.random()*(h_len-1));
-	let rand2 = Math.floor(Math.random()*(h_len-1));
-	if(rand == rand2){
-		if(rand2 == h_len-1){ rand2-- }
-		else{ rand2++ }
-	}
+	let rand  = generateRand((h_len-1));
+	let rand2 = generateRand((h_len-1),rand);
 	
-	if(keys[rand] == tag) rand = rand2;
+	let key = getPeopleKey(keys, tag, rand);
+	if(!key) return message.channel.send("No teams exist to resolve.");
 	
-	let t_arr = teams[keys[rand]].split('-');
+	let people = key.split('_');
+	
+	let t_arr = teams[key].split('-');
 	let left  = t_arr[0];
 	let right = t_arr[1];
-	let win_c = 2; // win condition
+
+	let right_person = people[0];
+	let left_person = (people.length == 2) ? people[1] : 'Io-Bot';
 	
 	if(rand >= rand2){
-		win_c = 1;
 		left = t_arr[1];
 		right = t_arr[0];
+		let temp = right_person;
+		right_person = left_person;
+		left_person = temp;
 	}
 
-	submitWin(r_client, d_client, message, left, right, keys[rand], win_c);
+	submitWin(r_client, d_client, message, left, right, key, left_person, right_person);
 }
 
 
-async function submitWin(r_client, d_client, message, left, right, opp_tag, win_c){
+async function submitWin(r_client, d_client, message, left, right, key, l_per, r_per){
 	let l_team = await redis_h.charsToTeam(r_client, message, left.split('_'));
 	let r_team = await redis_h.charsToTeam(r_client, message, right.split('_'));
 	let l_strs = l_team.unitsEmo(d_client);
@@ -74,32 +114,33 @@ async function submitWin(r_client, d_client, message, left, right, opp_tag, win_
 		const collector = question.createReactionCollector( filter, { max:1, time: 25000 });
 
 		collector.on('collect', (reaction, user) => {
+			let win;
+			let lose;
 			let react = reaction.emoji.name;
 			// Submitted response wins
-			if((react == '1️⃣' && win_c == 1) || (react == '2️⃣' && win_c == 2)){
-				message.channel.send(`${opp_tag} wins!`);
-				meta_h.addExp(r_client, message, opp_tag, 5);
-			}else{ // Submitted response loses
-				message.channel.send(`Computer wins!`);
-			}
-			let win  = left;
-			let lose = right;
-			if(react == '2️⃣'){
-				win  = right;
+			if(react == '1️⃣'){
+				message.channel.send(`${l_per} wins over ${r_per}!`);
+				if(l_per != 'Io-Bot') meta_h.addExp(r_client, message, l_per, 5);
+				win = left;
+				lose = right;
+			}else if(react == '2️⃣'){
+				message.channel.send(`${r_per} wins over ${l_per}!`);
+				if(r_per != 'Io-Bot') meta_h.addExp(r_client, message, r_per, 5);
+				win = right;
 				lose = left;
 			}
-			
+
 			teamWinLose(r_client, win, lose);
 			
 			meta_h.addExp(r_client, message, message.author.tag, 10, message.author.username);
 			
-			r_client.spop('ba_teams_' + opp_tag, function(err, result){
+			r_client.spop('ba_teams_' + key, function(err, result){
 				if(result == undefined || result == null){
-					r_client.hdel('ba_teams', opp_tag);
-					console.log("Removed ba_teams: " + opp_tag);
+					r_client.hdel('ba_teams', key);
+					console.log("Removed ba_teams: " + key);
 				}else{
 					let obj = {};
-					obj[opp_tag] = result;
+					obj[key] = result;
 					r_client.hmset('ba_teams', obj);
 					console.log("Added " + result + " to ba_teams");
 				}
@@ -265,4 +306,4 @@ async function teamWinLose(r_client, win, lose){
 	if(lose_score != null && lose_score > 0) r_client.zincrby('winning_teams', -1, lose);
 }
 
-module.exports = { mfk, love, fight, resolveFight };
+module.exports = { mfk, love, fight, resolveFight, challenge };
