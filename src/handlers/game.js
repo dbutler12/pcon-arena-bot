@@ -246,15 +246,17 @@ function submitMFK(r_client, d_client, message, team){
 
 function printLove(d_client, arr, love_str){
 	let len = arr.length;
+	let count = 0;
 	for(let i = 0; i < len; i++){
-		if(i%2 == 1){
+		if(i%2 == 0){
 			let chara = emoji_h.getEmojiString(d_client, arr[i]);
-			love_str = love_str + `${chara}: **${obj[i-1]}**`
+			love_str = love_str + `${chara}: **${arr[i+1]}**`
 		}
 		if(i != len && i%5 != 0) love_str = love_str + "     ";
 		if(i%5 == 0) love_str = love_str + "\n";
+		count++;
 	}
-	if((i-1)%5 != 0) love_str = love_str + "\n";
+	if((count-1)%5 != 0) love_str = love_str + "\n";
 	return love_str;
 }
 
@@ -262,7 +264,7 @@ async function love(r_client, d_client, message, usertag, choice = false){
 	const { promisify } = require('util');
 	const getAsync = promisify(r_client.zrevrange).bind(r_client);
 	
-	let m_str = `**__${message.author.username}`;
+	let m_str = `**__${message.author.username} Love Points__**`;
 	let loves = await getAsync(`love_${usertag}`, 0, -1, "withscores");
 	m_str = printLove(d_client, loves, m_str);
 	message.channel.send(m_str);
