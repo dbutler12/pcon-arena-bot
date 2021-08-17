@@ -89,8 +89,7 @@ async function submitWin(r_client, d_client, message, left, right, opp_tag, win_
 				lose = left;
 			}
 			
-			r_client.zincrby('winning_teams', 1, win);
-			r_client.zincrby('winning_teams', -1, lose);
+			teamWinLose(r_client, win, lose);
 			
 			meta_h.addExp(r_client, message, message.author.tag, 10, message.author.username);
 			
@@ -255,5 +254,15 @@ async function love(r_client, d_client, message, usertag, choice = false){
 	message.channel.send(m_str);
 }
 
+
+//TODO: Move this function if it becomes useful outside of this file scope
+async function teamWinLose(r_client, win, lose){
+	r_client.zincrby('winning_teams', 1, win);
+	
+	const { promisify } = require('util');
+	const getScore = promisify(r_client.zscore).bind(r_client);
+	let lose_score = await getScore(`winning_teams`, lose);
+	if(lose_score != null && lose_score > 0) r_client.zincrby('winning_teams', -1, lose);
+}
 
 module.exports = { mfk, love, fight, resolveFight };
