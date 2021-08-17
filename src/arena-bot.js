@@ -17,6 +17,8 @@ global.commands = {
 }
 
 global.com_call = {
+	arena: "!arena, then react to the team that would win in pvp",
+	fight: "!fight, then !name name name name name to construct a team",
 	level: "!level",
 	mfk: "!mfk or !mdk, then !name name name in order of !marry date kill",
 	"love-love": "!love-love",

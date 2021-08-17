@@ -175,7 +175,7 @@ function submitFight(r_client, d_client, message, team){
 
 function submitMFK(r_client, d_client, message, team){
 	let units_strs = team.unitsEmo(d_client);
-  message.channel.send(`Marry Date Kill:\n${units_strs[0]}\n${units_strs[1]}`);
+  message.channel.send(`Marry Date Kill?\n${units_strs[0]}\n${units_strs[1]}`);
   
 	const filter = response => {
 		return response.author.id === message.author.id && response.content.charAt(0) === '!';
