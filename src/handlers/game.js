@@ -251,10 +251,10 @@ function printLove(d_client, arr, love_str){
 		if(i%2 == 0){
 			let chara = emoji_h.getEmojiString(d_client, arr[i]);
 			love_str = love_str + `${chara}: **${arr[i+1]}**`
+			count++;
 		}
-		if(i != len && i%5 != 1) love_str = love_str + "     ";
-		if(i%5 == 1) love_str = love_str + "\n";
-		count++;
+		if(count%5 != 1) love_str = love_str + "     ";
+		if(count%5 == 1) love_str = love_str + "\n";
 	}
 	if((count-1)%5 != 1) love_str = love_str + "\n";
 	return love_str;
