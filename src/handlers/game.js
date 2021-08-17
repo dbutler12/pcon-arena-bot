@@ -55,13 +55,14 @@ async function resolveFight(r_client, d_client, message){
 		left = t_arr[1];
 		right = t_arr[0];
 	}
-	left  = await redis_h.charsToTeam(r_client, message, left.split('_'));
-	right = await redis_h.charsToTeam(r_client, message, right.split('_'));
+
 	submitWin(r_client, d_client, message, left, right, keys[rand], win_c);
 }
 
 
-function submitWin(r_client, d_client, message, l_team, r_team, opp_tag, win_c){
+function submitWin(r_client, d_client, message, left, right, opp_tag, win_c){
+	let l_team = await redis_h.charsToTeam(r_client, message, left.split('_'));
+	let r_team = await redis_h.charsToTeam(r_client, message, right.split('_'));
 	let l_strs = l_team.unitsEmo(d_client);
 	let r_strs = r_team.unitsEmo(d_client);
 	//1️⃣2️⃣
@@ -86,6 +87,16 @@ function submitWin(r_client, d_client, message, l_team, r_team, opp_tag, win_c){
 			}else{ // Submitted response loses
 				message.channel.send(`${user.tag} wins!`);
 			}
+			let win  = left;
+			let lose = right;
+			if(react == '2️⃣'){
+				win  = right;
+				lose = left;
+			}
+			
+			r_client.zincrby('winning_teams', 1, win);
+			r_client.zincrby('winning_teams', -1, lose);
+			
 			r_client.spop('ba_teams_' + opp_tag, function(err, result){
 				if(result == undefined || result == null){
 					r_client.hdel('ba_teams', opp_tag);
@@ -143,8 +154,8 @@ function submitFight(r_client, d_client, message, team){
 			raw_team[i] = await emoji_h.extractCharStr(raw_team[i]);
 		}
 
-		if(raw_team.length === 5) {
-			let userTeam = await redis_h.charsToTeam(r_client, message, raw_team);
+		let userTeam = await redis_h.charsToTeam(r_client, message, raw_team);
+		if(userTeam.num == 5) {
 			const { promisify } = require('util');
 			const existsAsync = promisify(r_client.hexists).bind(r_client);
 			let name = message.author.username;
@@ -156,13 +167,15 @@ function submitFight(r_client, d_client, message, team){
 				team_obj[tag] = team.unitsStr() + "-" + userTeam.unitsStr();
 				r_client.hmset('ba_teams', team_obj);
 			}else{
-				// Add to character set
+				// Add to set: ba_teams_${tag}
 				r_client.sadd(['ba_teams_' + tag, team.unitsStr() + "-" + userTeam.unitsStr()], function(err, reply) {
 					if(err){
 						console.log("ba_teams_" + tag +" err:" + err);
 					}
 				});
 			}
+			let user_units_strs = userTeam.unitsEmo(d_client);
+			message.channel.send(`Team ${user_units_strs[0]} submitted!`);
 		}else{
 			message.channel.send("Invalid number of units.");
 		}
@@ -208,12 +221,17 @@ function submitMFK(r_client, d_client, message, team){
 			let kill  = emoji_h.getEmojiString(d_client,raw_team[2]);
 			
 			message.channel.send(`${name} would marry ${marry} date ${date} and murder poor ${kill}`);
+			r_client.zincrby(`love_${tag}`, 3,  raw_team[0]);
+			r_client.zincrby(`love_${tag}`, 1,  raw_team[1]);
+			r_client.zincrby(`love_${tag}`, -4, raw_team[2]);
 			r_client.hincrby(`char_data_${team['char_' + raw_team[0]]['id']}`, 'wifed',  1);
 			r_client.hincrby(`char_data_${team['char_' + raw_team[1]]['id']}`, 'dated',  1);
 			r_client.hincrby(`char_data_${team['char_' + raw_team[2]]['id']}`, 'killed', 1);
+			/*
 			r_client.hincrby(`${tag}_wifed`, raw_team[0],1);
 			r_client.hincrby(`${tag}_dated`, raw_team[1],1);
 			r_client.hincrby(`${tag}_killed`,raw_team[2],1);
+			*/
 		}else{
 			//TODO: Consider not having a return message here, or something more generic
 			message.channel.send("Entered wrong units.");
@@ -242,8 +260,13 @@ function printLove(d_client, obj, love_str){
 
 async function love(r_client, d_client, message, usertag, choice = false){
 	const { promisify } = require('util');
-	const getAsync = promisify(r_client.hgetall).bind(r_client);
+	const getAsync = promisify(r_client.zrevrange).bind(r_client);
 	
+	let m_str = `**__${message.author.username}`;
+	let loves = await getAsync(`love_${usertag}`, 0, -1, "withscores");
+	m_str = printLove(d_client, loves, m_str);
+	message.channel.send(m_str);
+	/*
 	let wifed  = (choice == false || choice == 'wifed')  ? await getAsync(`${usertag}_wifed`)  : false;
 	let dated  = (choice == false || choice == 'dated')  ? await getAsync(`${usertag}_dated`)  : false;
 	let killed = (choice == false || choice == 'killed') ? await getAsync(`${usertag}_killed`) : false;
@@ -269,6 +292,7 @@ async function love(r_client, d_client, message, usertag, choice = false){
 		m_str = printLove(d_client, killed, m_str);
 		await message.channel.send(m_str);
 	}
+	*/
 }
 
 
