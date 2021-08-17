@@ -1,5 +1,27 @@
 const Units  = require('../units');
 
+async function generateRandomTeam(r_client, num){
+	const { promisify } = require('util');
+	const getAsync = promisify(r_client.get).bind(r_client);
+	let char_id = await getAsync('cur_char_id');
+	char_id = parseInt(char_id)-1;
+	
+	let id_arr = [];
+	for(let i = 0; i < num; i++){
+		id_arr[i] = Math.floor(Math.random()*char_id);
+		for(let j = 0; j < i; j++){
+			if(id_arr[i] == id_arr[j]){
+				i--;
+				break;
+			}
+		}
+	}
+	
+	let team = await redis_h.idToTeam(r_client, id_arr);
+	return team;
+}
+
+
 function createIDArray(chars, nick){
 	let id_arr = [];
 	let error = null;

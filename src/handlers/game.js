@@ -6,7 +6,7 @@ const meta_h   = require('./meta');
 
 // Fight game begin
 async function fight(r_client, d_client, message){
-	let team = await Units.generateRandomTeam(r_client,5);
+	let team = await redis_h.generateRandomTeam(r_client,5);
 	submitFight(r_client, d_client, message, team);
 	meta_h.addExp(r_client, message.author.tag, 10, message.author.username);
 }
@@ -14,7 +14,7 @@ async function fight(r_client, d_client, message){
 
 // Marry Date Kill game begin
 async function mfk(r_client, d_client, message){
-	let team = await Units.generateRandomTeam(r_client,3);
+	let team = await redis_h.generateRandomTeam(r_client,3);
 	submitMFK(r_client, d_client, message, team);
 	meta_h.addExp(r_client, message.author.tag, 5, message.author.username);
 }
