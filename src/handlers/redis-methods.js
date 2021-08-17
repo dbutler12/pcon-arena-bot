@@ -17,7 +17,7 @@ async function generateRandomTeam(r_client, num){
 		}
 	}
 	
-	let team = await redis_h.idToTeam(r_client, id_arr);
+	let team = await idToTeam(r_client, id_arr);
 	return team;
 }
 
