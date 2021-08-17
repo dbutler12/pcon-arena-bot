@@ -22,6 +22,18 @@ function checkLevel(score){
 }
 
 
+function checkMyLevel(r_client, message){
+	const { promisify } = require('util');
+	const getScore = promisify(r_client.zscore).bind(r_client);
+	let tag   = message.author.tag;
+	let user  = message.author.username;
+	let exp   = await getScore(`user_exp`, tag);
+	let level = checkLevel(exp);
+	let next  = 25.0*(level+1.0)*(1.0+(level+1.0)) - exp;
+	message.channel.send(`${user} is level ${level} (${next} from level ${level+1})`); 
+}
+
+
 function updateVer(r_client, version){
 	r_client.multi().
 	get('cur_version').
@@ -207,4 +219,4 @@ function help(message){
 	message.channel.send(str);
 }
 
-module.exports = { addChar, addExp, addNick, checkLevel, getVer, help, updateAllChars, updateChar, updateVer, viewChar };
+module.exports = { addChar, addExp, addNick, checkLevel, checkMyLevel, getVer, help, updateAllChars, updateChar, updateVer, viewChar };

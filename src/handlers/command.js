@@ -32,6 +32,8 @@ function com(command, args, client, message, state){
 			meta_h.getVer(r_client, message);
 		}else if(command === 'help'){
 			meta_h.help(message);
+		}else if(command === 'level'){
+			meta_h.checkMyLevel(r_client, message);
 		}
 	}
 	
