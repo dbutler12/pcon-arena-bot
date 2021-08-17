@@ -252,11 +252,11 @@ function printLove(d_client, arr, love_str){
 			let chara = emoji_h.getEmojiString(d_client, arr[i]);
 			love_str = love_str + `${chara}: **${arr[i+1]}**`
 		}
-		if(i != len && i%5 != 0) love_str = love_str + "     ";
-		if(i%5 == 0) love_str = love_str + "\n";
+		if(i != len && i%5 != 1) love_str = love_str + "     ";
+		if(i%5 == 1) love_str = love_str + "\n";
 		count++;
 	}
-	if((count-1)%5 != 0) love_str = love_str + "\n";
+	if((count-1)%5 != 1) love_str = love_str + "\n";
 	return love_str;
 }
 
@@ -264,7 +264,7 @@ async function love(r_client, d_client, message, usertag, choice = false){
 	const { promisify } = require('util');
 	const getAsync = promisify(r_client.zrevrange).bind(r_client);
 	
-	let m_str = `**__${message.author.username} Love Points__**`;
+	let m_str = `**__${message.author.username} Love Points__**\n`;
 	let loves = await getAsync(`love_${usertag}`, 0, -1, "withscores");
 	m_str = printLove(d_client, loves, m_str);
 	message.channel.send(m_str);
