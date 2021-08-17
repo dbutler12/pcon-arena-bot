@@ -45,6 +45,8 @@ client.on('message', message => {
     .split(/\s+/);
 
     com_h.com(CMD_NAME, args, client, message, 0);
+  }else if(message.channel.id == '855264420186816513'){
+  	com_h.intel(client, message);
   }
 });
 

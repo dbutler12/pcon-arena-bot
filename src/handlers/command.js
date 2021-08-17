@@ -13,8 +13,10 @@ const devs = {
 	'331952683579867136':'admin'
 }
 
+
 function com(command, args, client, message, state){
 	// Live commands
+	if(message.channel.id == '855264420186816513') return;
 	if(command in global.commands){
 		if(command === 'mfk' || command === 'mdk'){
 			game_h.mfk(r_client, client, message);
@@ -185,6 +187,21 @@ function com(command, args, client, message, state){
 }
 
 
+function intel(r_client, message){
+	if (message.attachments.size > 0) {
+    if (message.attachments.every(isImage)){
+        meta_h.addExp(r_client, message, message.author.tag, 5);
+    }
+	}
+}
+
+
+function isImage(attachment) {
+  let url = attachment.url;
+  return url.indexOf("png", url.length - "png".length) !== -1 || url.indexOf("jpg", url.length - "jpg".length) !== -1;
+}
+
+
 async function tester(r_client, args){
 	const { promisify } = require('util');
 	const getAsync = promisify(r_client.hgetall).bind(r_client);
@@ -221,4 +238,4 @@ async function tester(r_client, args){
 	console.log(b_team);
 }
 
-module.exports = { com };
+module.exports = { com, intel };
