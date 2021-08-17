@@ -22,7 +22,7 @@ function checkLevel(score){
 }
 
 
-function checkMyLevel(r_client, message){
+async function checkMyLevel(r_client, message){
 	const { promisify } = require('util');
 	const getScore = promisify(r_client.zscore).bind(r_client);
 	let tag   = message.author.tag;
