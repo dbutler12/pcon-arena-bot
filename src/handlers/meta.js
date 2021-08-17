@@ -13,6 +13,7 @@ async function addExp(r_client, message, tag, amount, user = false){
 	let level = checkLevel(exp2);
 	if(checkLevel(exp1) != level){
 		message.channel.send(`**${username} has reached level ${level}!**`); 
+		if(level == 0) message.channel.send(`Welcome to Io-Bot. Enjoy playing with the girls!`);
 	}
 }
 
