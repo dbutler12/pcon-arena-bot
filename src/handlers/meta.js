@@ -4,7 +4,7 @@ async function addExp(r_client, tag, amount, user = false){
 	const { promisify } = require('util');
 	const getScore = promisify(r_client.zscore).bind(r_client);
 	let exp1 = await getScore(`user_exp`, tag);
-	r_client.zincrby(`user_exp`, amount,  tag);
+	await r_client.zincrby(`user_exp`, amount,  tag);
 	let exp2 = await getScore(`user_exp`, tag);
 	
 	let username = (user == false) ? tag : user;
@@ -205,4 +205,4 @@ function help(message){
 	message.channel.send(str);
 }
 
-module.exports = { addNick, addChar, viewChar, updateChar, updateAllChars, updateVer, getVer, help };
+module.exports = { addChar, addExp, addNick, checkLevel, getVer, help, updateAllChars, updateChar, updateVer, viewChar };
