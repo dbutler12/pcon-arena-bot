@@ -8,7 +8,6 @@ const meta_h   = require('./meta');
 async function fight(r_client, d_client, message){
 	let team = await redis_h.generateRandomTeam(r_client,5);
 	submitFight(r_client, d_client, message, team);
-	meta_h.addExp(r_client, message.author.tag, 10, message.author.username);
 }
 
 
@@ -16,7 +15,6 @@ async function fight(r_client, d_client, message){
 async function mfk(r_client, d_client, message){
 	let team = await redis_h.generateRandomTeam(r_client,3);
 	submitMFK(r_client, d_client, message, team);
-	meta_h.addExp(r_client, message.author.tag, 5, message.author.username);
 }
 
 
@@ -53,7 +51,6 @@ async function resolveFight(r_client, d_client, message){
 	}
 
 	submitWin(r_client, d_client, message, left, right, keys[rand], win_c);
-	meta_h.addExp(r_client, message.author.tag, 15, message.author.username);
 }
 
 
@@ -94,6 +91,8 @@ async function submitWin(r_client, d_client, message, left, right, opp_tag, win_
 			
 			r_client.zincrby('winning_teams', 1, win);
 			r_client.zincrby('winning_teams', -1, lose);
+			
+			meta_h.addExp(r_client, message.author.tag, 10, message.author.username);
 			
 			r_client.spop('ba_teams_' + opp_tag, function(err, result){
 				if(result == undefined || result == null){
@@ -162,6 +161,7 @@ function submitFight(r_client, d_client, message, team){
 			}
 			let user_units_strs = userTeam.unitsEmo(d_client);
 			message.channel.send(`Team ${user_units_strs[0]} submitted!`);
+			meta_h.addExp(r_client, message.author.tag, 10, message.author.username);
 		}else{
 			message.channel.send("Invalid number of units.");
 		}
@@ -213,6 +213,7 @@ function submitMFK(r_client, d_client, message, team){
 			r_client.hincrby(`char_data_${team['char_' + raw_team[0]]['id']}`, 'wifed',  1);
 			r_client.hincrby(`char_data_${team['char_' + raw_team[1]]['id']}`, 'dated',  1);
 			r_client.hincrby(`char_data_${team['char_' + raw_team[2]]['id']}`, 'killed', 1);
+			meta_h.addExp(r_client, message.author.tag, 5, message.author.username);
 		}else{
 			//TODO: Consider not having a return message here, or something more generic
 			message.channel.send("Entered wrong units.");
