@@ -244,17 +244,17 @@ function submitMFK(r_client, d_client, message, team){
 }
 
 
-function printLove(d_client, obj, love_str){
-	let count = 1;
-	let len = Object.keys(obj).length;
-	for(let o in obj){
-		let chara = emoji_h.getEmojiString(d_client, o);
-		love_str = love_str + `${chara}: **${obj[o]}**`;
-		if(count != len && count%5 != 0) love_str = love_str + "     ";
-		if(count%5 == 0) love_str = love_str + "\n";
-		count = count + 1;
+function printLove(d_client, arr, love_str){
+	let len = arr.length;
+	for(let i = 0; i < len; i++){
+		if(i%2 == 1){
+			let chara = emoji_h.getEmojiString(d_client, arr[i]);
+			love_str = love_str + `${chara}: **${obj[i-1]}**`
+		}
+		if(i != len && i%5 != 0) love_str = love_str + "     ";
+		if(i%5 == 0) love_str = love_str + "\n";
 	}
-	if((count-1)%5 != 0) love_str = love_str + "\n";
+	if((i-1)%5 != 0) love_str = love_str + "\n";
 	return love_str;
 }
 
