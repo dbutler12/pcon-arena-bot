@@ -46,7 +46,7 @@ function com(command, args, client, message, state){
 	// Dev testing commands
 	else if(command in global.dev_commands && message.author.id in devs){
 		// Bot test channel commands
-		if(message.channel.id == "845007607055253565" || message.channel.id == "845007583060426794"){
+		if(message.channel.id == "845007607055253565"){
 		}
 	}
 	
