@@ -12,7 +12,7 @@ async function addExp(r_client, message, tag, amount, user = false){
 	let username = (user == false) ? tag : user;
 	let level = checkLevel(exp2);
 	if(checkLevel(exp1) != level){
-		message.channel.send(`${username} has reached level ${level}!`); 
+		message.channel.send(`**${username} has reached level ${level}!**`); 
 	}
 }
 
@@ -30,7 +30,7 @@ async function checkMyLevel(r_client, message){
 	let exp   = await getScore(`user_exp`, tag);
 	let level = checkLevel(exp);
 	let next  = 25.0*(level+1.0)*(1.0+(level+1.0)) - exp;
-	message.channel.send(`${user} is level ${level} (${next} from level ${level+1})`); 
+	message.channel.send(`**${user} is level ${level}**\n(${next} from level ${level+1})`); 
 }
 
 
