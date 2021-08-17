@@ -187,7 +187,7 @@ function com(command, args, client, message, state){
 }
 
 
-function intel(r_client, message){
+function intel(client, message){
 	if (message.attachments.size > 0) {
     if (message.attachments.every(isImage)){
         meta_h.addExp(r_client, message, message.author.tag, 5);
