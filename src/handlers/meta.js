@@ -1,5 +1,7 @@
 const emoji_h = require('../emojis');
 
+// y = 25*x*(1+x) where y = exp needed and x = level
+// inverse: y = -1/2 + 1/10 * sqrt(4x+25) where x = exp and y = level
 async function addExp(r_client, tag, amount, user = false){
 	const { promisify } = require('util');
 	const getScore = promisify(r_client.zscore).bind(r_client);

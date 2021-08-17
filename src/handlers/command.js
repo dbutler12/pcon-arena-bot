@@ -56,6 +56,8 @@ function com(command, args, client, message, state){
 			const channel01 = client.channels.cache.find(channel => channel.id === '833833221077860372');
 			channel01.send('restart-arena');
 			return;
+		}else if(command == 'add-exp'){
+			if(args.length == 2) meta_h.addExp(r_client, args[0], args[1])
 		}else if(command === 'add-char'){
 			if(args.length !== 2){
 				return message.channel.send("Not enough arguments to add character. Need char name and position.");
