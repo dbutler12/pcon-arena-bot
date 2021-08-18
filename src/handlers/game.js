@@ -17,7 +17,7 @@ async function challenge(r_client, d_client, message, args){
 		let m;
 		if(check.length == 1) {
 			m = members.find(member=>member.nickname === challenged);
-			if(m == undefined || m == null) m = members.find(member=>member.user.username === challenged);
+			if(m == undefined || m == null) m = members.find(member=>String.toLowerCase(member.user.username) === String.toLowerCase(challenged));
 		}
 		if(check.length == 2) m = members.find(member=>member.user.tag === challenged);
 		if(m != undefined && m != null){
@@ -60,7 +60,7 @@ function accept(r_client, d_client, message, args){
 		let m;
 		if(check.length == 1) {
 			m = members.find(member=>member.nickname === challenger);
-			if(m == undefined || m == null) m = members.find(member=>member.user.username === challenger);
+			if(m == undefined || m == null) m = members.find(String.toLowerCase(member=>member.user.username) === String.toLowerCase(challenger));
 		}
 		if(check.length == 2) m = members.find(member=>member.user.tag === challenger);
 		if(m != undefined && m != null){
