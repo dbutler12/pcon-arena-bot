@@ -22,7 +22,7 @@ async function generateRandomTeam(r_client, num){
 	return team;
 }
 
-function getTeamFromRaw(raw_team){
+async function getTeamFromRaw(raw_team){
 	for(let i in raw_team){
 		raw_team[i] = await emoji_h.extractCharStr(raw_team[i]);
 	}
