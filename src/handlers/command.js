@@ -38,7 +38,7 @@ function com(command, args, client, message, state){
 			meta_h.checkMyLevel(r_client, message);
 		}else if(command === 'fight'){
 			if(args.length == 0) game_h.fight(r_client, client, message);
-			if(args.length == 1) game_h.accept(r_client, d_client, message, args);
+			if(args.length == 1) game_h.accept(r_client, client, message, args);
 		}else if(command === 'arena'){
 			game_h.resolveFight(r_client, client, message);
 		}else if(command === 'fightme'){
