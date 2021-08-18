@@ -6,18 +6,22 @@ const meta_h   = require('./meta');
 
 function challenge(r_client, d_client, message, args){
 	if(args[0] == message.author.tag) return message.channel.send("No challenging yourself!");
-	if(args.length < 6) return message.channel.send("Challenge example: !challenge Deben Jun Kuka Tamaki Misato Maho");
+	if(args.length < 6) return message.channel.send("Example: !fightme Deben Jun Kuka Tamaki Misato Maho");
 	let challenged = args[0];
 	args.shift();
 	args = redis_h.getTeamFromRaw(args);
 	let team = redis_h.charsToTeam(r_client, message, args);
-	if(team.num == 0) return message.channel.send("Challenge example: !challenge Deben Jun Kuka Tamaki Misato Maho");
+	if(team.num < 5) return message.channel.send("Challenge example: !challenge Deben Jun Kuka Tamaki Misato Maho");
 	message.channel.guild.members.fetch({cache : false}).then(members=>{
 		let check = challenged.split('#');
 		let m;
-		if(check.length == 1) m = members.find(member=>member.nickname === challenged);
+		if(check.length == 1) {
+			m = members.find(member=>member.nickname === challenged);
+			if(m == undefined || m == null) m = members.find(member=>member.user.username === challenged);
+		}
 		if(check.length == 2) m = members.find(member=>member.user.tag === challenged);
 		if(m != undefined && m != null){
+			if(m.user.tag == message.author.tag) return message.channel.send("No challenging yourself!");
 			let tags = m.user.tag + "_" + message.author.tag;
 			let obj = {};
 			obj[tags] = team.unitsStr();
