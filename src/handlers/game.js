@@ -40,7 +40,7 @@ async function submitVSFight(r_client, d_client, message, challenged, challenger
 	let tags = challenged+"_"+challenger;
 	
 	let c_team = await hashAsync('challenges', tags);
-	c_team = c_team.split('_');
+	c_team = c_team[0].split('_');
 	c_team = await redis_h.charsToTeam(r_client, message, c_team);
 	if(c_team == undefined || c_team == null) return message.channel.send("Challenge between " + challenger + " and " + challenged + " does not exist.");
 	let completed = await submitFight(r_client, d_client, message, c_team, challenger);
