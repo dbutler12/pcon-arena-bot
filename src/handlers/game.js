@@ -26,7 +26,7 @@ async function challenge(r_client, d_client, message, args){
 			let obj = {};
 			obj[tags] = team.unitsStr();
 			r_client.hmset('challenges', obj);
-			message.channel.send(`A new challenge! Team ${team.emoStr()} from ${message.author.tag} vs ${m.user.tag} submitted.`);
+			message.channel.send(`A new challenge! Team ${team.unitsEmo()} from ${message.author.tag} vs ${m.user.tag} submitted.`);
 			meta_h.addExp(r_client, message, message.author.tag, 5, message.author.username);
 		}
 	});
