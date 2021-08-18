@@ -1,4 +1,5 @@
 const Units  = require('../units');
+const emoji_h = require('../emojis');
 
 async function generateRandomTeam(r_client, num){
 	const { promisify } = require('util');
@@ -19,6 +20,12 @@ async function generateRandomTeam(r_client, num){
 	
 	let team = await idToTeam(r_client, id_arr);
 	return team;
+}
+
+function getTeamFromRaw(raw_team){
+	for(let i in raw_team){
+		raw_team[i] = await emoji_h.extractCharStr(raw_team[i]);
+	}
 }
 
 
@@ -79,4 +86,4 @@ async function idToTeam(r_client, id_arr){
 		return new Units.Team(results, results.length);
 }
 
-module.exports = { createIDArray, charsToTeam, idToTeam, generateRandomTeam };
+module.exports = { createIDArray, charsToTeam, idToTeam, generateRandomTeam, getTeamFromRaw };

@@ -4,9 +4,62 @@ const emoji_h  = require('../emojis');
 const meta_h   = require('./meta');
 
 
-async function challenge(r_client, d_client, message, args){
-	let user = await message.channel.guild.members.fetch({cache : false}).then(members=>members.find(member=>member.user.tag === args[0]));
-	console.log(user);
+function challenge(r_client, d_client, message, args){
+	if(args[0] == message.author.tag) return message.channel.send("No challenging yourself!");
+	if(args.length < 6) return message.channel.send("Challenge example: !challenge Deben Jun Kuka Tamaki Misato Maho");
+	let challenged = args[0];
+	args.shift();
+	args = redis_h.getTeamFromRaw(args);
+	let team = redis_h.charsToTeam(r_client, message, args);
+	if(team.num == 0) return message.channel.send("Challenge example: !challenge Deben Jun Kuka Tamaki Misato Maho");
+	message.channel.guild.members.fetch({cache : false}).then(members=>{
+		let check = challenged.split('#');
+		let m;
+		if(check.length == 1) m = members.find(member=>member.nickname === challenged);
+		if(check.length == 2) m = members.find(member=>member.user.tag === challenged);
+		if(m != undefined && m != null){
+			let tags = m.user.tag + "_" + message.author.tag;
+			let obj = {};
+			obj[tags] = team.unitsStr();
+			r_client.hmset('challenges', obj);
+		}
+	});
+}
+
+
+async function submitVSFight(r_client, d_client, message, challenged, challenger){
+	const { promisify } = require('util');
+	const hashAsync = promisify(r_client.hmget).bind(r_client);
+	
+	let tags = challenged+"_"+challenger;
+	
+	let c_team = hashAsync('challenges', tags);
+	if(c_team == undefined || c_team == null) return message.channel.send("Challenge between " + challenger + " and " + challenged + " does not exist.");
+	let completed = submitFight(r_client, d_client, message, c_team, challenger);
+	if(completed == true){
+		r_client.hdel('challenges', tags);
+	}
+}
+
+// I am the challenged, accepting the fight from the challenger
+function accept(r_client, d_client, message, args){
+	if(args[0] == message.author.tag) return message.channel.send("No challenging yourself!");
+	//if(args.length < 6) return message.channel.send("Challenge example: !challenge Deben Jun Kuka Tamaki Misato Maho");
+	let challenger = args[0];
+	//args.shift();
+	//args = redis_h.getTeamFromRaw(args);
+	//let team = redis_h.charsToTeam(r_client, message, args);
+	//if(team.num == 0 || team.num < 5) return message.channel.send("Accept example: !accept Deben Jun Kuka Tamaki Misato Maho");
+	message.channel.guild.members.fetch({cache : false}).then(members=>{
+		let check = challenger.split('#');
+		let m;
+		if(check.length == 1) m = members.find(member=>member.nickname === challenger);
+		if(check.length == 2) m = members.find(member=>member.user.tag === challenger);
+		if(m != undefined && m != null){
+			submitVSFight(r_client, d_client, message, message.author.tag, m.user.tag);
+		}
+	});
+	//
 }
 
 
@@ -36,7 +89,7 @@ function generateRand(upTo, val1 = false, val2 = false){
 	return val;
 }
 
-function getFight(keys, tag, rand){
+function getPeopleKey(keys, tag, rand){
 	let key = keys[rand];
 	let people = key.split('_');
 	if(people[0] == tag || (people.length == 2 && people[1] == tag)){
@@ -155,7 +208,8 @@ async function submitWin(r_client, d_client, message, left, right, key, l_per, r
 }
 
 
-function submitFight(r_client, d_client, message, team){
+function submitFight(r_client, d_client, message, team, challenger = false){
+	let completed = false;
 	let units_strs = team.unitsEmo(d_client);
 	message.channel.send(`Create a team that beats this:\n${units_strs[0]}\n${units_strs[1]}`);
 
@@ -185,6 +239,7 @@ function submitFight(r_client, d_client, message, team){
 			const existsAsync = promisify(r_client.hexists).bind(r_client);
 			let name = message.author.username;
 			let tag  = message.author.tag;
+			if(challenger != false) tag = tag + "_" + challenger;
 			let tag_exists = await existsAsync('ba_teams', tag);
 			if(tag_exists != 1){
 				// Insert directly into tag
@@ -202,6 +257,7 @@ function submitFight(r_client, d_client, message, team){
 			let user_units_strs = userTeam.unitsEmo(d_client);
 			message.channel.send(`Team ${user_units_strs[0]} submitted!`);
 			meta_h.addExp(r_client, message, message.author.tag, 10, message.author.username);
+			completed = true;
 		}else{
 			message.channel.send("Invalid number of units.");
 		}
@@ -210,6 +266,7 @@ function submitFight(r_client, d_client, message, team){
 	collector.on('end', collected => {
 		//console.log(`End Collected ${collected.size} items.`);
 	});
+	return completed;
 }
 
 
@@ -306,4 +363,4 @@ async function teamWinLose(r_client, win, lose){
 	if(lose_score != null && lose_score > 0) r_client.zincrby('winning_teams', -1, lose);
 }
 
-module.exports = { mfk, love, fight, resolveFight, challenge };
+module.exports = { accept, challenge, fight, love, mfk, resolveFight };

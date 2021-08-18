@@ -8,7 +8,8 @@ global.commands = {
 	arena: "!arena to see battles other people have added teams for. Choose which is correct to resolve the fight",
 	level: "!level to check level and next exp amount",
 	char: "Use !char name to Get character information. Will accept nicknames.",
-	fight: "!fight to see an arena team. Add your own team to beat it! (Example: !Jun Kaori Makoto Misato Yori)",
+	fight: "!fight to see an arena team. Add your own team to beat it! (Example: !Jun Ssuzume Speco Misato Io)",
+	fightme: "!fightme to initiate a fight with someone. (Example: !fightme Deben Jun SSuzume Speco Misato Io",
 	help: "Use !help to get command help",
 	mfk: "!mfk or !mdk: Marry date kill game. Bot will list 3 characters that you can choose to marry, date, or kill.(Example: Jun Yukari Io)\nAfterwards, use ! and tell the bot in order of !Marry Date Kill the characters.(Example: !Io Jun Yukari)",
 	mdk: "Marry date kill game",
@@ -18,12 +19,13 @@ global.commands = {
 
 global.com_call = {
 	arena: "!arena, then react to the team that would win in pvp",
+	char: "!char name",
 	fight: "!fight, then !name name name name name to construct a team",
+	fightme: "!fightme User Unit Unit Unit Unit Unit",
 	level: "!level",
 	mfk: "!mfk or !mdk, then !name name name in order of !marry date kill",
 	"love-love": "!love-love",
 	help: "!help",
-	char: "!char name",
 	version: "!version"
 }
 

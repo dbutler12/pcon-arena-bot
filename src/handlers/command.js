@@ -37,10 +37,15 @@ function com(command, args, client, message, state){
 		}else if(command === 'level'){
 			meta_h.checkMyLevel(r_client, message);
 		}else if(command === 'fight'){
-			game_h.fight(r_client, client, message);
+			if(args.length == 0) game_h.fight(r_client, client, message);
+			if(args.length == 1) game_h.accept(r_client, d_client, message, args);
 		}else if(command === 'arena'){
 			game_h.resolveFight(r_client, client, message);
+		}else if(command === 'fightme'){
+			game_h.challenge(r_client, client, message, args);
 		}
+		
+		//TODO: Add command to look at pending challenges
 	}
 	
 	// Dev testing commands
@@ -94,8 +99,6 @@ function com(command, args, client, message, state){
 				message.channel.send("Enemy party needs 5 members.");
 			}
 		
-		}else if(command === 'challenge'){
-			game_h.challenge(r_client, client, message, args[0]);
 		// Test functions
 		}else if(command === 'add-sort'){
 			r_client.zadd('lifetime', 100*Math.random(), args[0]);
