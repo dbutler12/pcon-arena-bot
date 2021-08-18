@@ -4,13 +4,13 @@ const emoji_h  = require('../emojis');
 const meta_h   = require('./meta');
 
 
-function challenge(r_client, d_client, message, args){
+async function challenge(r_client, d_client, message, args){
 	if(args[0] == message.author.tag) return message.channel.send("No challenging yourself!");
 	if(args.length < 6) return message.channel.send("Example: !fightme Deben Jun Kuka Tamaki Misato Maho");
 	let challenged = args[0];
 	args.shift();
-	args = redis_h.getTeamFromRaw(args);
-	let team = redis_h.charsToTeam(r_client, message, args);
+	args = await redis_h.getTeamFromRaw(args);
+	let team = await redis_h.charsToTeam(r_client, message, args);
 	if(team.num < 5) return message.channel.send("Challenge example: !challenge Deben Jun Kuka Tamaki Misato Maho");
 	message.channel.guild.members.fetch({cache : false}).then(members=>{
 		let check = challenged.split('#');
@@ -37,9 +37,9 @@ async function submitVSFight(r_client, d_client, message, challenged, challenger
 	
 	let tags = challenged+"_"+challenger;
 	
-	let c_team = hashAsync('challenges', tags);
+	let c_team = await hashAsync('challenges', tags);
 	if(c_team == undefined || c_team == null) return message.channel.send("Challenge between " + challenger + " and " + challenged + " does not exist.");
-	let completed = submitFight(r_client, d_client, message, c_team, challenger);
+	let completed = await submitFight(r_client, d_client, message, c_team, challenger);
 	if(completed == true){
 		r_client.hdel('challenges', tags);
 	}
@@ -57,7 +57,10 @@ function accept(r_client, d_client, message, args){
 	message.channel.guild.members.fetch({cache : false}).then(members=>{
 		let check = challenger.split('#');
 		let m;
-		if(check.length == 1) m = members.find(member=>member.nickname === challenger);
+		if(check.length == 1) {
+			m = members.find(member=>member.nickname === challenger);
+			if(m == undefined || m == null) m = members.find(member=>member.user.username === challenger);
+		}
 		if(check.length == 2) m = members.find(member=>member.user.tag === challenger);
 		if(m != undefined && m != null){
 			submitVSFight(r_client, d_client, message, message.author.tag, m.user.tag);
