@@ -43,10 +43,7 @@ async function submitVSFight(r_client, d_client, message, challenged, challenger
 	c_team = c_team[0].split('_');
 	c_team = await redis_h.charsToTeam(r_client, message, c_team);
 	if(c_team == undefined || c_team == null) return message.channel.send("Challenge between " + challenger + " and " + challenged + " does not exist.");
-	let completed = await submitFight(r_client, d_client, message, c_team, challenger);
-	if(completed == true){
-		r_client.hdel('challenges', tags);
-	}
+	submitFight(r_client, d_client, message, c_team, challenger);
 }
 
 // I am the challenged, accepting the fight from the challenger
@@ -220,7 +217,6 @@ async function submitWin(r_client, d_client, message, left, right, key, l_per, r
 
 
 function submitFight(r_client, d_client, message, team, challenger = false){
-	let completed = false;
 	let units_strs = team.unitsEmo(d_client);
 	message.channel.send(`Create a team that beats this:\n${units_strs[0]}\n${units_strs[1]}`);
 
@@ -269,7 +265,7 @@ function submitFight(r_client, d_client, message, team, challenger = false){
 			let against = team.unitsEmo(d_client, true);
 			message.channel.send(`Team **${user_units_strs[0]} vs ${against[0]}** submitted for evaluation.`);
 			meta_h.addExp(r_client, message, message.author.tag, 20, message.author.username);
-			completed = true;
+			if(challenger != false) r_client.hdel('challenges', message.author.tag + "_" + challenger);
 		}else{
 			message.channel.send("Invalid number of units.");
 		}
@@ -278,7 +274,6 @@ function submitFight(r_client, d_client, message, team, challenger = false){
 	collector.on('end', collected => {
 		//console.log(`End Collected ${collected.size} items.`);
 	});
-	return completed;
 }
 
 
