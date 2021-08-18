@@ -26,8 +26,8 @@ async function challenge(r_client, d_client, message, args){
 			let obj = {};
 			obj[tags] = team.unitsStr();
 			r_client.hmset('challenges', obj);
-			message.channel.send(`A new challenge!  ${team.unitsEmo(d_client)[0]} from **${message.author.tag} vs ${m.user.tag}** submitted.`);
-			meta_h.addExp(r_client, message, message.author.tag, 5, message.author.username);
+			message.channel.send(`A new challenge!  ${team.unitsEmo(d_client)[0]}: **${message.author.tag} vs ${m.user.tag}** submitted.`);
+			meta_h.addExp(r_client, message, message.author.tag, 20, message.author.username);
 		}
 	});
 }
@@ -182,19 +182,19 @@ async function submitWin(r_client, d_client, message, left, right, key, l_per, r
 			// Submitted response wins
 			if(react == '1️⃣'){
 				message.channel.send(`${l_per} wins over ${r_per}!`);
-				if(l_per != 'Io-Bot') meta_h.addExp(r_client, message, l_per, 5);
+				if(l_per != 'Io-Bot') meta_h.addExp(r_client, message, l_per, 35);
 				win = left;
 				lose = right;
 			}else if(react == '2️⃣'){
 				message.channel.send(`${r_per} wins over ${l_per}!`);
-				if(r_per != 'Io-Bot') meta_h.addExp(r_client, message, r_per, 5);
+				if(r_per != 'Io-Bot') meta_h.addExp(r_client, message, r_per, 35);
 				win = right;
 				lose = left;
 			}
 
 			teamWinLose(r_client, win, lose);
 			
-			meta_h.addExp(r_client, message, message.author.tag, 10, message.author.username);
+			meta_h.addExp(r_client, message, message.author.tag, 25, message.author.username);
 			
 			r_client.spop('ba_teams_' + key, function(err, result){
 				if(result == undefined || result == null){
@@ -226,7 +226,7 @@ function submitFight(r_client, d_client, message, team, challenger = false){
 		return response.author.id === message.author.id && response.content.charAt(0) === '!';
 	};
 	
-	const collector = message.channel.createMessageCollector(filter, { max: 1, time: 50000, errors: ['time'] });
+	const collector = message.channel.createMessageCollector(filter, { max: 1, time: 100000, errors: ['time'] });
 	collector.on('collect', async m => {
     let raw_team = "";
     
@@ -265,7 +265,7 @@ function submitFight(r_client, d_client, message, team, challenger = false){
 			}
 			let user_units_strs = userTeam.unitsEmo(d_client);
 			message.channel.send(`Team ${user_units_strs[0]} submitted!`);
-			meta_h.addExp(r_client, message, message.author.tag, 10, message.author.username);
+			meta_h.addExp(r_client, message, message.author.tag, 20, message.author.username);
 			completed = true;
 		}else{
 			message.channel.send("Invalid number of units.");
@@ -319,7 +319,7 @@ function submitMFK(r_client, d_client, message, team){
 			r_client.hincrby(`char_data_${team['char_' + raw_team[0]]['id']}`, 'wifed',  1);
 			r_client.hincrby(`char_data_${team['char_' + raw_team[1]]['id']}`, 'dated',  1);
 			r_client.hincrby(`char_data_${team['char_' + raw_team[2]]['id']}`, 'killed', 1);
-			meta_h.addExp(r_client, message, message.author.tag, 5, message.author.username);
+			meta_h.addExp(r_client, message, message.author.tag, 20, message.author.username);
 		}else{
 			//TODO: Consider not having a return message here, or something more generic
 			message.channel.send("Entered wrong units.");
