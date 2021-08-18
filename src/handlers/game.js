@@ -161,9 +161,8 @@ async function submitWin(r_client, d_client, message, left, right, key, l_per, r
 	let l_strs = l_team.unitsEmo(d_client);
 	let r_strs = r_team.unitsEmo(d_client, true);
 	//1️⃣2️⃣
-	message.channel.send('Which team wins?\n' +
-	`1️⃣ ${l_strs[0]}  **__VS__**  ${r_strs[0]} 2️⃣\n` +
-	`(${l_strs[1]})  **__VS__**  (${r_strs[1]})\n`).then((question) => {
+	message.channel.send('**Choose Who Wins**\n' +
+	`1️⃣ ${l_strs[0]}  **__VS__**  ${r_strs[0]} 2️⃣\n`).then((question) => {
     // Have our bot guide the user by reacting with the correct reactions
     question.react('1️⃣');
     question.react('2️⃣');
