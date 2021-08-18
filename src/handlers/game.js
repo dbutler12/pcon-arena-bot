@@ -264,7 +264,8 @@ function submitFight(r_client, d_client, message, team, challenger = false){
 				});
 			}
 			let user_units_strs = userTeam.unitsEmo(d_client);
-			message.channel.send(`Team ${user_units_strs[0]} submitted!`);
+			let against = team.unitsEmo(d_client, true);
+			message.channel.send(`Team **${user_units_strs[0]} vs ${against}** submitted for evaluation.`);
 			meta_h.addExp(r_client, message, message.author.tag, 20, message.author.username);
 			completed = true;
 		}else{
