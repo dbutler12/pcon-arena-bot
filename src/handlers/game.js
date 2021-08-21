@@ -277,7 +277,7 @@ function submitFight(r_client, d_client, message, team, challenger = false){
 
 
 
-function wifeDateKillIncr(r_client, raw_team, tag, ignored = false){
+function wifeDateKillIncr(r_client, team, raw_team, tag, ignored = false){
 	let m = 3;
 	let d = 1;
 	let k = -4;
@@ -322,7 +322,7 @@ function submitMFK(r_client, d_client, message, team){
 		
 		if(raw_team[0] in global.commands){
 			message.channel.send(`${name} made ${units_strs[0]} sad.`);
-			wifeDateKillIncr(r_client, units_strs[1].split(' '), tag, true); // Caching done here, ignored set to true
+			wifeDateKillIncr(r_client, team, units_strs[1].split(' '), tag, true); // Caching done here, ignored set to true
 			return; // End session
 		}
 		
@@ -338,16 +338,18 @@ function submitMFK(r_client, d_client, message, team){
 			let kill  = emoji_h.getEmojiString(d_client,raw_team[2]);
 			
 			message.channel.send(`${name} would marry ${marry} date ${date} and murder poor ${kill}`);
-			wifeDateKillIncr(r_client, raw_team, tag); // caching done here
+			wifeDateKillIncr(r_client, team, raw_team, tag); // caching done here
 			meta_h.addExp(r_client, message, message.author.tag, 20, message.author.username);
 		}else{
 			//TODO: Consider not having a return message here, or something more generic
 			message.channel.send(`${name} Entered wrong units, making ${units_strs[0]} sad.`);
-			wifeDateKillIncr(r_client, units_strs[1].split(' '), tag, true); // Caching done here, ignored set to true
+			wifeDateKillIncr(r_client, team, units_strs[1].split(' '), tag, true); // Caching done here, ignored set to true
 		}
 	});
 
 	collector.on('end', collected => {
+		if(collected.size == 0) wifeDateKillIncr(r_client, team, units_strs[1].split(' '), tag, true);
+		message.channel.send(`${name} made ${units_strs[0]} sad.`);
 		console.log(`End Collected ${collected.size} items.`);
 	});
 }
