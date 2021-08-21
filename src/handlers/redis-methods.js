@@ -5,7 +5,7 @@ async function generateRandomTeam(r_client, num){
 	const { promisify } = require('util');
 	const getAsync = promisify(r_client.get).bind(r_client);
 	let char_id = await getAsync('cur_char_id');
-	char_id = parseInt(char_id)-1;
+	char_id = parseInt(char_id);
 	
 	let id_arr = [];
 	for(let i = 0; i < num; i++){

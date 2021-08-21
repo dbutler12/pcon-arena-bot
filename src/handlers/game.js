@@ -329,11 +329,12 @@ function submitMFK(r_client, d_client, message, team){
 }
 
 
-function printLove(d_client, arr, love_str){
+function printLove(d_client, message, arr, love_str){
 	let len = arr.length;
 	let count = 0;
 	let spacing = "     ";
 	let space = spacing;
+	let first = true;
 	for(let i = 0; i < len; i++){
 		if(i%2 == 0){
 			let chara = emoji_h.getEmojiString(d_client, arr[i]);
@@ -343,9 +344,14 @@ function printLove(d_client, arr, love_str){
 		}
 		if(count%5 != 1) love_str = love_str + space;
 		if(count%5 == 1) love_str = love_str + "\n";
+		if(count == 21){
+			message.channel.send(love_str);
+			count = 1;
+			love_str = "";
+		}
 	}
 	if((count-1)%5 != 1) love_str = love_str + "\n";
-	return love_str;
+	if(love_str != "") message.channel.send(love_str);
 }
 
 async function love(r_client, d_client, message, usertag, choice = false){
@@ -354,8 +360,7 @@ async function love(r_client, d_client, message, usertag, choice = false){
 	
 	let m_str = `**__${message.author.username} Love Points__**\n`;
 	let loves = await getAsync(`love_${usertag}`, 0, -1, "withscores");
-	m_str = printLove(d_client, loves, m_str);
-	message.channel.send(m_str);
+	printLove(d_client, message, loves, m_str);
 }
 
 
