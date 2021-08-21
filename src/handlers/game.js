@@ -345,7 +345,7 @@ function printLove(d_client, message, arr, love_str){
 		if(count%5 != 1) love_str = love_str + space;
 		if(count%5 == 1) love_str = love_str + "\n";
 		if(count == 21){
-			message.channel.send(love_str);
+			message.channel.send(love_str + "\n");
 			count = 1;
 			love_str = "";
 		}
