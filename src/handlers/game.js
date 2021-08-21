@@ -348,8 +348,10 @@ function submitMFK(r_client, d_client, message, team){
 	});
 
 	collector.on('end', collected => {
-		if(collected.size == 0) wifeDateKillIncr(r_client, team, units_strs[1].split(' '), tag, true);
-		message.channel.send(`${name} made ${units_strs[0]} sad.`);
+		if(collected.size == 0){
+			wifeDateKillIncr(r_client, team, units_strs[1].split(' '), tag, true);
+			message.channel.send(`${name} made ${units_strs[0]} sad.`);
+		}
 		console.log(`End Collected ${collected.size} items.`);
 	});
 }
