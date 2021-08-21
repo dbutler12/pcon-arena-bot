@@ -302,6 +302,7 @@ function wifeDateKillIncr(r_client, raw_team, tag, ignored = false){
 
 function submitMFK(r_client, d_client, message, team){
 	let name = message.author.username;
+	let tag  = message.author.tag;
 	let units_strs = team.unitsEmo(d_client);
   message.channel.send(`Marry Date Kill?\n${units_strs[0]}\n${units_strs[1]}`);
   
@@ -332,7 +333,6 @@ function submitMFK(r_client, d_client, message, team){
 		let validate = await redis_h.charsToTeam(r_client, message, raw_team);
 
 		if(raw_team.length === 3 && team.compareTeam(validate) === 3) {
-			let tag  = message.author.tag;
 			let marry = emoji_h.getEmojiString(d_client,raw_team[0]);
 			let date  = emoji_h.getEmojiString(d_client,raw_team[1]);
 			let kill  = emoji_h.getEmojiString(d_client,raw_team[2]);
@@ -348,7 +348,7 @@ function submitMFK(r_client, d_client, message, team){
 	});
 
 	collector.on('end', collected => {
-		//console.log(`End Collected ${collected.size} items.`);
+		console.log(`End Collected ${collected.size} items.`);
 	});
 }
 
