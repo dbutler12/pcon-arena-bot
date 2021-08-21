@@ -291,7 +291,9 @@ function wifeDateKillIncr(r_client, team, raw_team, tag, ignored = false){
 	r_client.zincrby(`love_${tag}`,	k, raw_team[2]);
 	
 	if(ignored){
-		r_client.hincrby(`char_data_${team['char_' + raw_team[0]]['id']}`, 'ignored',  1);
+		r_client.hincrby(`char_data_${team['char_' + raw_team[0]]['id']}`, 'ignored', 1);
+		r_client.hincrby(`char_data_${team['char_' + raw_team[1]]['id']}`, 'ignored', 1);
+		r_client.hincrby(`char_data_${team['char_' + raw_team[2]]['id']}`, 'ignored', 1);
 	}else{
 		r_client.hincrby(`char_data_${team['char_' + raw_team[0]]['id']}`, 'wifed',  1);
 		r_client.hincrby(`char_data_${team['char_' + raw_team[1]]['id']}`, 'dated',  1);
