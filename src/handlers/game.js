@@ -276,7 +276,32 @@ function submitFight(r_client, d_client, message, team, challenger = false){
 }
 
 
+
+function wifeDateKillIncr(r_client, raw_team, tag, ignored = false){
+	let m = 3;
+	let d = 1;
+	let k = -4;
+	if(ignored){
+		m = -1;
+		d = -1;
+		k = -1;
+	}
+	r_client.zincrby(`love_${tag}`, m,  raw_team[0]);
+	r_client.zincrby(`love_${tag}`, d,  raw_team[1]);
+	r_client.zincrby(`love_${tag}`,	k, raw_team[2]);
+	
+	if(ignored){
+		r_client.hincrby(`char_data_${team['char_' + raw_team[0]]['id']}`, 'ignored',  1);
+	}else{
+		r_client.hincrby(`char_data_${team['char_' + raw_team[0]]['id']}`, 'wifed',  1);
+		r_client.hincrby(`char_data_${team['char_' + raw_team[1]]['id']}`, 'dated',  1);
+		r_client.hincrby(`char_data_${team['char_' + raw_team[2]]['id']}`, 'killed', 1);
+	}
+}
+
+
 function submitMFK(r_client, d_client, message, team){
+	let name = message.author.username;
 	let units_strs = team.unitsEmo(d_client);
   message.channel.send(`Marry Date Kill?\n${units_strs[0]}\n${units_strs[1]}`);
   
@@ -294,7 +319,11 @@ function submitMFK(r_client, d_client, message, team){
 		
 		raw_team = raw_message.split(/\s+/);
 		
-		if(raw_team[0] in global.commands) return; // End session
+		if(raw_team[0] in global.commands){
+			message.channel.send(`${name} made ${units_strs[0]} sad.`);
+			wifeDateKillIncr(r_client, units_strs[1].split(' '), tag, true); // Caching done here, ignored set to true
+			return; // End session
+		}
 		
 		for(let i in raw_team){
 			raw_team[i] = await emoji_h.extractCharStr(raw_team[i]);
@@ -303,23 +332,18 @@ function submitMFK(r_client, d_client, message, team){
 		let validate = await redis_h.charsToTeam(r_client, message, raw_team);
 
 		if(raw_team.length === 3 && team.compareTeam(validate) === 3) {
-			let name = message.author.username;
 			let tag  = message.author.tag;
 			let marry = emoji_h.getEmojiString(d_client,raw_team[0]);
 			let date  = emoji_h.getEmojiString(d_client,raw_team[1]);
 			let kill  = emoji_h.getEmojiString(d_client,raw_team[2]);
 			
 			message.channel.send(`${name} would marry ${marry} date ${date} and murder poor ${kill}`);
-			r_client.zincrby(`love_${tag}`, 3,  raw_team[0]);
-			r_client.zincrby(`love_${tag}`, 1,  raw_team[1]);
-			r_client.zincrby(`love_${tag}`, -4, raw_team[2]);
-			r_client.hincrby(`char_data_${team['char_' + raw_team[0]]['id']}`, 'wifed',  1);
-			r_client.hincrby(`char_data_${team['char_' + raw_team[1]]['id']}`, 'dated',  1);
-			r_client.hincrby(`char_data_${team['char_' + raw_team[2]]['id']}`, 'killed', 1);
+			wifeDateKillIncr(r_client, raw_team, tag); // caching done here
 			meta_h.addExp(r_client, message, message.author.tag, 20, message.author.username);
 		}else{
 			//TODO: Consider not having a return message here, or something more generic
-			message.channel.send("Entered wrong units.");
+			message.channel.send(`${name} Entered wrong units, making ${units_strs[0]} sad.`);
+			wifeDateKillIncr(r_client, units_strs[1].split(' '), tag, true); // Caching done here, ignored set to true
 		}
 	});
 
@@ -345,7 +369,7 @@ function printLove(d_client, message, arr, love_str){
 		if(count%5 != 1) love_str = love_str + space;
 		if(count%5 == 1) love_str = love_str + "\n";
 		if(count == 21){
-			message.channel.send(love_str + "\n");
+			message.channel.send(love_str);
 			count = 1;
 			love_str = "";
 		}
