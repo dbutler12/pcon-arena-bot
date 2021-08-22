@@ -181,13 +181,13 @@ async function submitWin(r_client, d_client, message, left, right, key, l_per, r
 			if(react == '1️⃣'){
 				message.channel.send(`${l_per} wins over ${r_per}!`);
 				if(l_per != 'Io-Bot') meta_h.addExp(r_client, message, l_per, 35);
-				if(r_per != 'Io-Bot') redis_h.addLike(r_client, message, r_per, await charsToTeam(r_client, message, right), -2);
+				if(r_per != 'Io-Bot') redis_h.addLike(r_client, message, r_per, await redis_h.charsToTeam(r_client, message, right), -2);
 				win = left;
 				lose = right;
 			}else if(react == '2️⃣'){
 				message.channel.send(`${r_per} wins over ${l_per}!`);
 				if(r_per != 'Io-Bot') meta_h.addExp(r_client, message, r_per, 35);
-				if(l_per != 'Io-Bot') redis_h.addLike(r_client, message, l_per, await charsToTeam(r_client, message, left), -2);
+				if(l_per != 'Io-Bot') redis_h.addLike(r_client, message, l_per, await redis_h.charsToTeam(r_client, message, left), -2);
 				win = right;
 				lose = left;
 			}
