@@ -182,8 +182,10 @@ async function submitWin(r_client, d_client, message, left, right, key, l_per, r
 				message.channel.send(`${l_per} wins over ${r_per}!`);
 				if(l_per != 'Io-Bot') meta_h.addExp(r_client, message, l_per, 35);
 				if(r_per != 'Io-Bot'){
-					let lose_team = await redis_h.charsToTeam(r_client, message, right);
-					redis_h.addLike(r_client, message, r_per, lose_team, -2);
+					(async () => {
+						let lose_team = await redis_h.charsToTeam(r_client, message, right);
+						redis_h.addLike(r_client, message, r_per, lose_team, -2);
+					})();
 				}
 				win = left;
 				lose = right;
@@ -191,8 +193,10 @@ async function submitWin(r_client, d_client, message, left, right, key, l_per, r
 				message.channel.send(`${r_per} wins over ${l_per}!`);
 				if(r_per != 'Io-Bot') meta_h.addExp(r_client, message, r_per, 35);
 				if(l_per != 'Io-Bot'){
-					let lose_team = await redis_h.charsToTeam(r_client, message, left);
-					redis_h.addLike(r_client, message, l_per, lose_team, -2);
+					(async () => {
+						let lose_team = await redis_h.charsToTeam(r_client, message, left);
+						redis_h.addLike(r_client, message, l_per, lose_team, -2);
+					})();
 				}
 				win = right;
 				lose = left;
