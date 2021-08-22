@@ -100,24 +100,6 @@ function com(command, args, client, message, state){
 			}
 		
 		// Test functions
-		}else if(command === 'add-sort'){
-			r_client.zadd('lifetime', 100*Math.random(), args[0]);
-		}else if(command === 'test-sort'){
-			r_client.zrevrangebyscore("lifetime", args[1], args[0], "withscores", function(err, rep){ 	
-				if(rep.length === 0){
-					message.channel.send("Empty");
-				}else{
-					message.channel.send(rep); 
-					console.log(rep);
-				}
-			}); 
-		}else if(command === 'test-range'){ // Get the highest scored item in the set
-			r_client.zrange("lifetime", -1, -1, function(err,rep){
-				message.channel.send(rep);
-				console.log(rep);
-			});
-		}else if(command === 'test-asyn'){
-			tester(r_client, args);
 		}else if(command === 'test-react'){
 				// Use a promise to wait for the question to reach Discord first
         message.channel.send('👍 👎 | :Jun::Illya::Miyako::Kuka::Shizuru:\n' +
@@ -206,40 +188,5 @@ function isImage(attachment) {
 }
 
 
-async function tester(r_client, args){
-	const { promisify } = require('util');
-	const getAsync = promisify(r_client.hgetall).bind(r_client);
-	
-	let nick = await getAsync('char_nick');
-	
-	let args2 = ["arisa", "saren", "ninon", "tamaki", "jun"];
-
-	let id_arr = [];
-	let id_arr2 = [];
-	for(let i = 0; i < args.length; i++){
-		let char_str = args[i].charAt(0).toUpperCase() + args[i].substr(1).toLowerCase();
-		let char_str2 = args2[i].charAt(0).toUpperCase() + args2[i].substr(1).toLowerCase();
-		if(!(char_str in nick)){
-			return message.channel.send(`Char ${char_str} unknown.`);
-		}
-		id_arr.push(nick[char_str]);
-		id_arr2.push(nick[char_str2]);
-	}
-
-	const units = [];
-	const units2 = [];
-	
-	for(let i = 0; i < 5; i++){
-		units.push(await getAsync(`char_data_${id_arr[i]}`));
-		units2.push(await getAsync(`char_data_${id_arr2[i]}`));
-	}
-
-	let a_team = new Units.Team(units, units.length);
-	if(a_team.num === -1) return message.channel.send("Invalid team: can't have duplicate characters.");
-	let b_team = new Units.Team(units2, units2.length, a_team);
-	
-	console.log(a_team);
-	console.log(b_team);
-}
 
 module.exports = { com, intel };

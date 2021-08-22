@@ -1,6 +1,26 @@
 const Units  = require('../units');
 const emoji_h = require('../emojis');
 
+
+
+async function addLike(r_client, message, tag, team, amount){
+	amount = amount*8;
+	const { promisify } = require('util');
+	const getScore = promisify(r_client.zscore).bind(r_client);
+	for(let un in team.units){
+		if(this[team.units[un].id] == -1) {
+			console.log(`Unit ID missing for ${team.units[un].name}`);
+			continue;
+		}
+		let score = await getScore(`like_${tag}`, team.units[un].name)
+		if(amount >= 0 || (score != null && score > 0)) r_client.zincrby(`like_${tag}`, amount, team.units[un].name);
+	}
+}
+
+
+
+
+
 async function generateRandomTeam(r_client, num){
 	const { promisify } = require('util');
 	const getAsync = promisify(r_client.get).bind(r_client);

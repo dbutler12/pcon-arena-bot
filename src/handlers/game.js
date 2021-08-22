@@ -181,11 +181,13 @@ async function submitWin(r_client, d_client, message, left, right, key, l_per, r
 			if(react == '1️⃣'){
 				message.channel.send(`${l_per} wins over ${r_per}!`);
 				if(l_per != 'Io-Bot') meta_h.addExp(r_client, message, l_per, 35);
+				if(r_per != 'Io-Bot') redis_h.addLike(r_client, message, r_per, await charsToTeam(r_client, message, right), -2);
 				win = left;
 				lose = right;
 			}else if(react == '2️⃣'){
 				message.channel.send(`${r_per} wins over ${l_per}!`);
 				if(r_per != 'Io-Bot') meta_h.addExp(r_client, message, r_per, 35);
+				if(l_per != 'Io-Bot') redis_h.addLike(r_client, message, l_per, await charsToTeam(r_client, message, left), -2);
 				win = right;
 				lose = left;
 			}
@@ -264,7 +266,11 @@ function submitFight(r_client, d_client, message, team, challenger = false){
 			let against = team.unitsEmo(d_client, true);
 			message.channel.send(`Team **${user_units_strs[0]} vs ${against[0]}** submitted for evaluation.`);
 			meta_h.addExp(r_client, message, message.author.tag, 20, message.author.username);
-			if(challenger != false) r_client.hdel('challenges', message.author.tag + "_" + challenger);
+			redis_h.addLike(r_client, message, message.author.tag, userTeam, 1);
+			if(challenger != false) {
+				r_client.hdel('challenges', message.author.tag + "_" + challenger);
+				redis_h.addLike(r_client, message, challenger, team, 1);
+			}
 		}else{
 			message.channel.send("Invalid number of units.");
 		}
@@ -323,7 +329,7 @@ function submitMFK(r_client, d_client, message, team){
 		raw_team = raw_message.split(/\s+/);
 		
 		if(raw_team[0] in global.commands){
-			message.channel.send(`${name} made ${units_strs[0]} sad.`);
+			message.channel.send(`${name} made ${units_strs[0]}sad.`);
 			wifeDateKillIncr(r_client, team, units_strs[1].split(' '), tag, true); // Caching done here, ignored set to true
 			return; // End session
 		}
@@ -343,8 +349,7 @@ function submitMFK(r_client, d_client, message, team){
 			wifeDateKillIncr(r_client, team, raw_team, tag); // caching done here
 			meta_h.addExp(r_client, message, message.author.tag, 20, message.author.username);
 		}else{
-			//TODO: Consider not having a return message here, or something more generic
-			message.channel.send(`${name} Entered wrong units, making ${units_strs[0]} sad.`);
+			message.channel.send(`${name} wrote the wrong units or mispelled their names, making ${units_strs[0]}sad.`);
 			wifeDateKillIncr(r_client, team, units_strs[1].split(' '), tag, true); // Caching done here, ignored set to true
 		}
 	});
@@ -352,11 +357,12 @@ function submitMFK(r_client, d_client, message, team){
 	collector.on('end', collected => {
 		if(collected.size == 0){
 			wifeDateKillIncr(r_client, team, units_strs[1].split(' '), tag, true);
-			message.channel.send(`${name} made ${units_strs[0]} sad.`);
+			message.channel.send(`${name} made ${units_strs[0]}sad.`);
 		}
 		console.log(`End Collected ${collected.size} items.`);
 	});
 }
+
 
 
 function printLove(d_client, message, arr, love_str){
